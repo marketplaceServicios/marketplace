@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-cream;
+  }
+
+  body {
+    @apply bg-background text-primary font-sans antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-accent text-white hover:bg-accent-hover transition-colors;
+  }
+
+  .btn-secondary {
+    @apply bg-sage text-white hover:bg-sage-dark transition-colors;
+  }
+
+  .btn-outline {
+    @apply border-2 border-accent text-accent hover:bg-accent hover:text-white transition-colors;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-2 rounded-lg border border-cream bg-white focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all;
+  }
+
+  .input-accent {
+    @apply w-full px-4 py-3 rounded-lg bg-accent/20 border-0 focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all;
+  }
+
+  .card {
+    @apply bg-white rounded-xl border border-cream shadow-sm;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-white/80 hover:bg-white/10 transition-colors;
+  }
+
+  .sidebar-item-active {
+    @apply bg-accent text-white;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
