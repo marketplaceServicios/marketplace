@@ -39,7 +39,8 @@ export default {
         warning: '#D4A039',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Gilroy', 'system-ui', 'sans-serif'],
+        serif: ['Baskervville', 'Georgia', 'serif'],
       },
     },
   },

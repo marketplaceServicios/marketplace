@@ -2,13 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Gilroy';
+  src: url('./assets/fonts/gilroy/Gilroy-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('./assets/fonts/gilroy/Gilroy-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('./assets/fonts/gilroy/Gilroy-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('./assets/fonts/gilroy/Gilroy-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fuente Baskervville - Serif (títulos elegantes) */
+@font-face {
+  font-family: 'Baskervville';
+  src: url('./assets/fonts/baskervville/Baskervville-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Baskervville';
+  src: url('./assets/fonts/baskervville/Baskervville-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Baskervville';
+  src: url('./assets/fonts/baskervville/Baskervville-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Baskervville';
+  src: url('./assets/fonts/baskervville/Baskervville-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   * {
     @apply border-cream;
   }
 
   body {
-    @apply bg-background text-primary font-sans antialiased;
+    font-family: 'Gilroy', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply bg-background text-primary antialiased;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Baskervville', Georgia, serif;
   }
 }
 

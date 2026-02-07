@@ -41,7 +41,8 @@ export default {
         danger: '#B94A3D',     // Rojo terracota
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['Gilroy', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['Baskervville', 'Georgia', 'serif'],
       },
     },
   },

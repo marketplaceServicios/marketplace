@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useAuthStore } from '@/store/authStore'
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react'
+import logo from '@/assets/images/logos/vertical-colores.png'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -40,28 +41,13 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary via-primary-light to-sage flex items-center justify-center p-4">
       <div className="w-full max-w-5xl grid md:grid-cols-2 gap-8 items-center">
-        {/* Left side - Illustration */}
+        {/* Left side - Logo */}
         <div className="hidden md:flex flex-col items-center justify-center text-white">
-          <div className="w-64 h-64 bg-white/10 rounded-full flex items-center justify-center mb-8">
-            <svg
-              viewBox="0 0 200 200"
-              className="w-48 h-48"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="100" cy="100" r="80" fill="#E8E2D8" opacity="0.3" />
-              <path
-                d="M100 40c-33.137 0-60 26.863-60 60s26.863 60 60 60 60-26.863 60-60-26.863-60-60-60zm0 10c27.614 0 50 22.386 50 50s-22.386 50-50 50-50-22.386-50-50 22.386-50 50-50z"
-                fill="#CB7A5B"
-              />
-              <circle cx="100" cy="85" r="20" fill="#CB7A5B" />
-              <path
-                d="M100 115c-22.091 0-40 12.536-40 28v7h80v-7c0-15.464-17.909-28-40-28z"
-                fill="#CB7A5B"
-              />
-            </svg>
-          </div>
-          <h1 className="text-4xl font-bold mb-2">Vive Silver</h1>
+          <img
+            src={logo}
+            alt="Vive Silver"
+            className="h-64 w-auto mb-6"
+          />
           <p className="text-lg text-white/80">Panel de Proveedor</p>
         </div>
 
@@ -70,12 +56,12 @@ export function LoginPage() {
           <CardHeader className="text-center pb-2">
             <div className="flex justify-center mb-4 md:hidden">
               <img
-                src="/logo.png"
+                src={logo}
                 alt="Vive Silver"
-                className="h-16 object-contain"
+                className="h-36 object-contain"
               />
             </div>
-            <h2 className="text-2xl font-bold text-primary">Bienvenido</h2>
+            <h2 className="text-2xl font-bold text-primary font-serif">Bienvenido</h2>
             <p className="text-slate">Ingresa a tu cuenta de proveedor</p>
           </CardHeader>
           <CardContent>
