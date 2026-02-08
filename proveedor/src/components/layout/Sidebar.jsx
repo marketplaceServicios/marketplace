@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
+import logo from '@/assets/images/logos/blanco.png'
 
 const menuItems = [
   { icon: Home, label: 'Dashboard', path: '/' },
@@ -90,14 +91,10 @@ export function Sidebar() {
         {/* Logo */}
         <div className="p-6 flex items-center gap-3">
           <img
-            src="/logo.png"
+            src={logo}
             alt="Vive Silver"
-            className="h-10 w-auto brightness-0 invert"
+            className="h-20 w-auto"
           />
-          <div className="flex flex-col">
-            <span className="text-white font-semibold text-lg">Vive</span>
-            <span className="text-accent text-xs font-medium tracking-wider">SILVER</span>
-          </div>
         </div>
 
         {/* Navigation */}

@@ -1,0 +1,13 @@
+services:
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vive-silver-admin
+    restart: always
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true

@@ -4,6 +4,7 @@ import { Eye, EyeOff, Leaf } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
+import logo from '@/assets/images/logo/vertical-colores.png'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -61,18 +62,12 @@ export function LoginPage() {
       {/* Login Card */}
       <div className="w-full max-w-md bg-primary rounded-2xl p-6 sm:p-8 relative z-10 shadow-2xl mx-4">
         {/* Logo */}
-        <div className="flex flex-col items-center mb-6 sm:mb-8">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 bg-cream rounded-full flex items-center justify-center mb-3 shadow-lg">
-            <img
-              src="/logo.png"
-              alt="Vive Silver"
-              className="h-10 sm:h-12 w-auto"
-            />
-          </div>
-          <div className="text-center">
-            <span className="text-white font-bold text-xl sm:text-2xl">Vive</span>
-            <span className="text-accent font-semibold text-xl sm:text-2xl ml-1">Silver</span>
-          </div>
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <img
+            src={logo}
+            alt="Vive Silver"
+            className="h-36 sm:h-44 w-auto"
+          />
         </div>
 
         {/* Title */}
