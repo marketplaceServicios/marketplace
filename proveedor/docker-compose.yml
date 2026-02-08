@@ -1,0 +1,13 @@
+services:
+  proveedor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vive-silver-proveedor
+    restart: always
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
