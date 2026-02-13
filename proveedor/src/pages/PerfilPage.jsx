@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { FormField } from '@/components/forms/FormField'
+import { FormTextarea } from '@/components/forms/FormTextarea'
 import { FormSelect } from '@/components/forms/FormSelect'
 import { FileUpload } from '@/components/shared/FileUpload'
 import { useAuthStore } from '@/store/authStore'
@@ -21,7 +22,10 @@ export function PerfilPage() {
     fechaNacimiento: user?.fechaNacimiento || '',
     direccion: user?.direccion || '',
     rol: user?.rol || '',
-    avatar: user?.avatar || ''
+    avatar: user?.avatar || '',
+    rnt: user?.rnt || '',
+    politicasGenerales: user?.politicasGenerales || '',
+    informacionSoporte: user?.informacionSoporte || ''
   })
 
   const [showUpload, setShowUpload] = useState(false)

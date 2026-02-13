@@ -2,56 +2,38 @@
 export const mockCategorias = [
   {
     id: 1,
-    nombre: 'Ciudades',
-    descripcion: 'Planes turisticos en ciudades principales',
-    imagen: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=300&h=200&fit=crop'
+    nombre: 'Bodas Silver',
+    descripcion: 'Celebraciones cuidadas, locaciones confiables y planificación sin estrés.',
+    imagen: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=300&h=200&fit=crop'
   },
   {
     id: 2,
-    nombre: 'Playa',
-    descripcion: 'Destinos de playa y costa',
+    nombre: 'Viajes Silver',
+    descripcion: 'Rutas tranquilas, tiempos humanos y experiencias con sentido.',
     imagen: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300&h=200&fit=crop'
   },
   {
     id: 3,
-    nombre: 'Naturaleza',
-    descripcion: 'Experiencias en la naturaleza',
-    imagen: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=200&fit=crop'
-  },
-  {
-    id: 4,
-    nombre: 'Aventura',
-    descripcion: 'Actividades de aventura y deportes extremos',
-    imagen: 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=300&h=200&fit=crop'
-  },
-  {
-    id: 5,
-    nombre: 'Cultural',
-    descripcion: 'Tours culturales e historicos',
+    nombre: 'Celebraciones',
+    descripcion: 'Aniversarios, renovación de votos, encuentros familiares.',
     imagen: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=300&h=200&fit=crop'
   },
   {
-    id: 6,
-    nombre: 'Gastronomia',
-    descripcion: 'Experiencias gastronomicas',
+    id: 4,
+    nombre: 'Servicios',
+    descripcion: 'Fotografía, música, catering y aliados verificados para tu evento o viaje.',
     imagen: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=300&h=200&fit=crop'
-  },
-  {
-    id: 7,
-    nombre: 'Bienestar',
-    descripcion: 'Spa y bienestar',
-    imagen: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=300&h=200&fit=crop'
   }
 ]
 
 // Planes del proveedor
 export const mockPlanes = [
-  // Ciudades
+  // Viajes Silver
   {
     id: 1,
     titulo: 'Catedral de sal',
-    descripcion: 'Visita guiada a la catedral de sal de Zipaquira',
-    categoria: 'Ciudades',
+    descripcion: 'Visita guiada a la catedral de sal de Zipaquirá',
+    categoria: 'Viajes Silver',
     valor: 150000,
     imagen: 'https://images.unsplash.com/photo-1583531172705-9b3b5d8e6e9b?w=400&h=300&fit=crop',
     isPrincipal: true,
@@ -61,18 +43,18 @@ export const mockPlanes = [
     id: 2,
     titulo: 'Ipiales',
     descripcion: 'Tour al santuario de Las Lajas',
-    categoria: 'Ciudades',
+    categoria: 'Viajes Silver',
     valor: 280000,
     imagen: 'https://images.unsplash.com/photo-1568402102990-bc541580b59f?w=400&h=300&fit=crop',
     isPrincipal: false,
     isOferta: true
   },
-  // Playa
+  // Viajes Silver
   {
     id: 3,
     titulo: 'Cartagena',
     descripcion: 'Paquete completo en Cartagena de Indias',
-    categoria: 'Playa',
+    categoria: 'Viajes Silver',
     valor: 450000,
     imagen: 'https://images.unsplash.com/photo-1583531172705-9b3b5d8e6e9b?w=400&h=300&fit=crop',
     isPrincipal: false,
@@ -80,9 +62,9 @@ export const mockPlanes = [
   },
   {
     id: 4,
-    titulo: 'San Andres',
-    descripcion: 'Paraiso en el Caribe colombiano',
-    categoria: 'Playa',
+    titulo: 'San Andrés',
+    descripcion: 'Paraíso en el Caribe colombiano',
+    categoria: 'Viajes Silver',
     valor: 850000,
     imagen: 'https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?w=400&h=300&fit=crop',
     isPrincipal: true,
@@ -90,20 +72,20 @@ export const mockPlanes = [
   },
   {
     id: 5,
-    titulo: 'Pacifico',
-    descripcion: 'Avistamiento de ballenas en el Pacifico',
-    categoria: 'Playa',
+    titulo: 'Pacífico',
+    descripcion: 'Avistamiento de ballenas en el Pacífico',
+    categoria: 'Celebraciones',
     valor: 650000,
     imagen: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop',
     isPrincipal: false,
     isOferta: true
   },
-  // Naturaleza
+  // Bodas Silver
   {
     id: 6,
-    titulo: 'Cascada 1',
-    descripcion: 'Caminata a cascadas naturales',
-    categoria: 'Naturaleza',
+    titulo: 'Boda en Hacienda Bambusa',
+    descripcion: 'Celebración íntima en hacienda cafetera',
+    categoria: 'Bodas Silver',
     valor: 120000,
     imagen: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=400&h=300&fit=crop',
     isPrincipal: false,
@@ -111,9 +93,9 @@ export const mockPlanes = [
   },
   {
     id: 7,
-    titulo: 'Cascada 2',
-    descripcion: 'Tour de cascadas premium',
-    categoria: 'Naturaleza',
+    titulo: 'Renovación de votos',
+    descripcion: 'Ceremonia especial de renovación de votos',
+    categoria: 'Bodas Silver',
     valor: 180000,
     imagen: 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=400&h=300&fit=crop',
     isPrincipal: true,
@@ -121,9 +103,9 @@ export const mockPlanes = [
   },
   {
     id: 8,
-    titulo: 'Cascada 3',
-    descripcion: 'Aventura en cascadas secretas',
-    categoria: 'Naturaleza',
+    titulo: 'Fotografía profesional Silver',
+    descripcion: 'Sesión fotográfica profesional para eventos',
+    categoria: 'Servicios',
     valor: 220000,
     imagen: 'https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&h=300&fit=crop',
     isPrincipal: false,
@@ -183,11 +165,11 @@ export const mockReservas = [
   }
 ]
 
-// Cotizaciones
+// Cotizaciónes
 export const mockCotizaciones = [
   {
     id: 1,
-    titulo: 'Cotizacion 1',
+    titulo: 'Cotización 1',
     plan: 'Tour Cartagena',
     categoria: 'Ciudades',
     cliente: 'Pedro Sanchez',
@@ -197,13 +179,13 @@ export const mockCotizaciones = [
     fechaRequerida: '15 de marzo 2026',
     fechaCreacion: '02 de febrero',
     fechaServicio: '20 de febrero',
-    requerimientos: 'Necesitamos transporte para 10 personas desde Bogota. Preferimos hotel en el centro historico.',
+    requerimientos: 'Necesitamos transporte para 10 personas desde Bogota. Preferimos hotel en el centro histórico.',
     imagen: 'https://images.unsplash.com/photo-1583531172705-9b3b5d8e6e9b?w=400&h=300&fit=crop',
     resuelta: false
   },
   {
     id: 2,
-    titulo: 'Cotizacion 2',
+    titulo: 'Cotización 2',
     plan: 'San Andres VIP',
     categoria: 'Playa',
     cliente: 'Laura Jimenez',
@@ -213,13 +195,13 @@ export const mockCotizaciones = [
     fechaRequerida: '20 de abril 2026',
     fechaCreacion: '02 de febrero',
     fechaServicio: '20 de febrero',
-    requerimientos: 'Viaje de bodas para 2 personas. Queremos la experiencia mas lujosa posible.',
+    requerimientos: 'Viaje de bodas para 2 personas. Queremos la experiencia más lujosa posible.',
     imagen: 'https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?w=400&h=300&fit=crop',
     resuelta: false
   },
   {
     id: 3,
-    titulo: 'Cotizacion 3',
+    titulo: 'Cotización 3',
     plan: 'Aventura Cascadas',
     categoria: 'Naturaleza',
     cliente: 'Roberto Castro',
@@ -229,13 +211,13 @@ export const mockCotizaciones = [
     fechaRequerida: '10 de febrero 2026',
     fechaCreacion: '02 de febrero',
     fechaServicio: '20 de febrero',
-    requerimientos: 'Grupo de 15 companeros de trabajo. Necesitamos actividades de team building.',
+    requerimientos: 'Grupo de 15 compañeros de trabajo. Necesitamos actividades de team building.',
     imagen: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=400&h=300&fit=crop',
     resuelta: false
   },
   {
     id: 4,
-    titulo: 'Cotizacion 4',
+    titulo: 'Cotización 4',
     plan: 'Catedral de Sal',
     categoria: 'Ciudades',
     cliente: 'Sofia Vargas',
@@ -245,13 +227,13 @@ export const mockCotizaciones = [
     fechaRequerida: '25 de febrero 2026',
     fechaCreacion: '02 de febrero',
     fechaServicio: '20 de febrero',
-    requerimientos: 'Familia con 2 ninos pequenos. Necesitamos guia en espanol.',
+    requerimientos: 'Familia con 2 niños pequeños. Necesitamos guía en español.',
     imagen: 'https://images.unsplash.com/photo-1568402102990-bc541580b59f?w=400&h=300&fit=crop',
     resuelta: false
   },
   {
     id: 5,
-    titulo: 'Cotizacion 5',
+    titulo: 'Cotización 5',
     plan: 'Tour Pacifico',
     categoria: 'Playa',
     cliente: 'Miguel Angel',
@@ -267,7 +249,7 @@ export const mockCotizaciones = [
   },
   {
     id: 6,
-    titulo: 'Cotizacion 6',
+    titulo: 'Cotización 6',
     plan: 'Ipiales Tour',
     categoria: 'Ciudades',
     cliente: 'Carmen Ruiz',
@@ -302,7 +284,7 @@ export const mockEquipo = [
     celular: '+57 310 222 3333',
     fechaNacimiento: '22/07/1990',
     direccion: 'Carrera 15, Medellin',
-    rol: 'Atencion al cliente',
+    rol: 'Atención al cliente',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
   },
   {
@@ -362,7 +344,7 @@ export const mockEquipo = [
     celular: '+57 310 888 9999',
     fechaNacimiento: '25/06/1989',
     direccion: 'Calle 80, Medellin',
-    rol: 'Atencion al cliente',
+    rol: 'Atención al cliente',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop'
   }
 ]
@@ -371,7 +353,7 @@ export const mockEquipo = [
 export const roles = [
   'Operaciones',
   'Producto',
-  'Atencion al cliente',
+  'Atención al cliente',
   'Administrador',
   'Contabilidad',
   'Ventas'
@@ -381,7 +363,7 @@ export const roles = [
 export const roleColors = {
   'Operaciones': 'terracotta',
   'Producto': 'sage',
-  'Atencion al cliente': 'slate',
+  'Atención al cliente': 'slate',
   'Administrador': 'olive',
   'Contabilidad': 'warning',
   'Ventas': 'sage'

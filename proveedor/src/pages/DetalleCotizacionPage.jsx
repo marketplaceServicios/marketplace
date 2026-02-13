@@ -12,7 +12,8 @@ import {
   FileText,
   Phone,
   Mail,
-  CheckCircle
+  CheckCircle,
+  MessageCircle
 } from 'lucide-react'
 
 export function DetalleCotizacionPage() {
@@ -29,7 +30,7 @@ export function DetalleCotizacionPage() {
   if (!cotizacion) {
     return (
       <div className="text-center py-12">
-        <p className="text-slate mb-4">Cotizacion no encontrada</p>
+        <p className="text-slate mb-4">Cotización no encontrada</p>
         <Button onClick={() => navigate('/cotizaciones')}>
           Volver a cotizaciones
         </Button>
@@ -45,7 +46,7 @@ export function DetalleCotizacionPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Solicitud de Cotizacion #${cotizacion.id}`}
+        title={`Solicitud de Cotización #${cotizacion.id}`}
         subtitle={cotizacion.plan}
         action={
           <Button variant="ghost" onClick={() => navigate('/cotizaciones')}>
@@ -121,16 +122,25 @@ export function DetalleCotizacionPage() {
             </CardContent>
           </Card>
 
-          {/* Action Button */}
-          <Button
-            onClick={handleMarcarResuelta}
-            className="w-full"
-            size="lg"
-            disabled={cotizacion.resuelta}
-          >
-            <CheckCircle className="h-4 w-4 mr-2" />
-            {cotizacion.resuelta ? 'Ya resuelta' : 'Marcar como resuelta'}
-          </Button>
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <Button
+              onClick={handleMarcarResuelta}
+              className="flex-1"
+              size="lg"
+              disabled={cotizacion.resuelta}
+            >
+              <CheckCircle className="h-4 w-4 mr-2" />
+              {cotizacion.resuelta ? 'Ya resuelta' : 'Marcar como resuelta'}
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Solicitar info
+            </Button>
+          </div>
         </div>
 
         {/* Contact Sidebar */}
@@ -142,7 +152,7 @@ export function DetalleCotizacionPage() {
                   <Phone className="h-5 w-5 text-sage" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate">Telefono</p>
+                  <p className="text-xs text-slate">Teléfono</p>
                   <p className="font-medium text-primary">
                     {cotizacion.telefono}
                   </p>

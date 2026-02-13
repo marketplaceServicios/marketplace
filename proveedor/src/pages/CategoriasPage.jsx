@@ -12,22 +12,22 @@ export function CategoriasPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Todas tus categorias"
-        subtitle="Organiza tus planes por categorias"
+        title="Todas tus categorías"
+        subtitle="Organiza tus planes por categorías"
         action={
           <Button onClick={() => navigate('/crear-categoria')}>
             <Plus className="h-4 w-4 mr-2" />
-            Nueva categoria
+            Nueva categoría
           </Button>
         }
       />
 
       {categorias.length === 0 ? (
         <div className="text-center py-12 text-slate">
-          <p className="mb-4">No tienes categorias creadas</p>
+          <p className="mb-4">No tienes categorías creadas</p>
           <Button onClick={() => navigate('/crear-categoria')}>
             <Plus className="h-4 w-4 mr-2" />
-            Crear tu primera categoria
+            Crear tu primera categoría
           </Button>
         </div>
       ) : (

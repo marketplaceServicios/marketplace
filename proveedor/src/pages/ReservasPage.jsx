@@ -139,8 +139,8 @@ export function ReservasPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Selecciona la fecha y visibiliza tus compromisos"
-        subtitle="Calendario de reservas activas"
+        title="Reservas"
+        subtitle="Confirma disponibilidad y mantén tu agenda al día. Vive Silver te ayuda a ordenar el flujo."
       />
 
       <div className="grid lg:grid-cols-3 gap-6">

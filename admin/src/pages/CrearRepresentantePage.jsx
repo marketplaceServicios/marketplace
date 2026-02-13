@@ -16,9 +16,9 @@ import { FormSelect } from '@/components/forms/FormSelect'
 import { useEmpresasStore } from '@/store/empresasStore'
 
 const tiposDocumento = [
-  { value: 'cedula', label: 'Cedula de ciudadania' },
+  { value: 'cedula', label: 'Cédula de ciudadanía' },
   { value: 'pasaporte', label: 'Pasaporte' },
-  { value: 'cedula_extranjeria', label: 'Cedula de extranjeria' },
+  { value: 'cedula_extranjeria', label: 'Cédula de extranjería' },
 ]
 
 export function CrearRepresentantePage() {
@@ -57,8 +57,8 @@ export function CrearRepresentantePage() {
         documentos: [
           { id: 1, nombre: 'RUT', url: '/docs/rut.pdf' },
           { id: 2, nombre: 'Registro mercantil', url: '/docs/registro.pdf' },
-          { id: 3, nombre: 'Certificacion bancaria', url: '/docs/banco.pdf' },
-          { id: 4, nombre: 'Cedula representante legal', url: '/docs/cedula.pdf' },
+          { id: 3, nombre: 'Certificación bancaria', url: '/docs/banco.pdf' },
+          { id: 4, nombre: 'Cédula representante legal', url: '/docs/cedula.pdf' },
         ]
       })
       sessionStorage.removeItem('nuevaEmpresa')
@@ -70,7 +70,7 @@ export function CrearRepresentantePage() {
 
   return (
     <div>
-      <PageHeader title="Informacion del representante legal" />
+      <PageHeader title="Información del representante legal" />
 
       <div className="bg-white rounded-xl border border-cream p-4 sm:p-6 shadow-sm max-w-3xl">
         <FormField
@@ -78,7 +78,7 @@ export function CrearRepresentantePage() {
           label="Nombre del representante legal"
           value={formData.nombre}
           onChange={handleChange('nombre')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormSelect
@@ -95,24 +95,24 @@ export function CrearRepresentantePage() {
           label="Documento"
           value={formData.documento}
           onChange={handleChange('documento')}
-          placeholder="Numero"
+          placeholder="Número"
           type="text"
         />
 
         <FormField
           icon={MapPin}
-          label="Direccion"
+          label="Dirección"
           value={formData.direccion}
           onChange={handleChange('direccion')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormField
           icon={Phone}
-          label="Telefono fijo"
+          label="Teléfono fijo"
           value={formData.telefonoFijo}
           onChange={handleChange('telefonoFijo')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormField
@@ -120,7 +120,7 @@ export function CrearRepresentantePage() {
           label="Celular"
           value={formData.celular}
           onChange={handleChange('celular')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormField
@@ -128,7 +128,7 @@ export function CrearRepresentantePage() {
           label="Correo"
           value={formData.correo}
           onChange={handleChange('correo')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
           type="email"
         />
 

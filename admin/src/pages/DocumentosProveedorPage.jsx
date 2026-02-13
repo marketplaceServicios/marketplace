@@ -51,7 +51,7 @@ export function DocumentosProveedorPage() {
           variant="outline"
           onClick={() => navigate(`/proveedor/${id}`)}
         >
-          Volver a informacion
+          Volver a información
         </Button>
       </div>
     </div>

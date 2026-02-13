@@ -7,7 +7,7 @@ import { BarChart } from '@/components/charts/BarChart'
 import { usePlanesStore } from '@/store/planesStore'
 import { useReservasStore } from '@/store/reservasStore'
 import { useCotizacionesStore } from '@/store/cotizacionesStore'
-import { FileText } from 'lucide-react'
+import { FileText, AlertTriangle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export function DashboardPage() {
@@ -40,8 +40,8 @@ export function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Bienvenido!"
-        subtitle="Panel de control de tu negocio"
+        title="Tu panel de gestión"
+        subtitle="Aquí ves lo esencial: solicitudes nuevas, reservas confirmadas y tus próximos servicios."
       />
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -72,6 +72,28 @@ export function DashboardPage() {
             </CardContent>
           </Card>
 
+          {/* Pendientes de calidad */}
+          <Card>
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-sage/10 rounded-lg">
+                  <AlertTriangle className="h-6 w-6 text-sage" />
+                </div>
+                <div>
+                  <p className="font-semibold text-primary">
+                    Pendientes de calidad
+                  </p>
+                  <p className="text-sm text-slate">
+                    fotos / accesibilidad / políticas
+                  </p>
+                </div>
+              </div>
+              <Badge variant="secondary" className="text-lg px-4 py-2">
+                0
+              </Badge>
+            </CardContent>
+          </Card>
+
           {/* Bar Chart */}
           <Card>
             <CardHeader>
@@ -90,7 +112,7 @@ export function DashboardPage() {
           {/* Pie Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Reservas por categoria</CardTitle>
+              <CardTitle>Reservas por categoría</CardTitle>
             </CardHeader>
             <CardContent>
               <PieChart

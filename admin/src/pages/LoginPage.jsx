@@ -72,8 +72,8 @@ export function LoginPage() {
 
         {/* Title */}
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Inicia sesion</h1>
-          <p className="text-cream/70 text-sm">Accede a tu panel administrativo</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Acceso administrativo</h1>
+          <p className="text-cream/70 text-sm">Gestiona calidad, contenidos, proveedores y soporte del ecosistema Vive Silver.</p>
         </div>
 
         {/* Form */}
@@ -90,11 +90,11 @@ export function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-cream text-sm mb-2 font-medium">Contrasena</label>
+            <label className="block text-cream text-sm mb-2 font-medium">Contraseña</label>
             <div className="relative">
               <Input
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Ingresa tu contrasena"
+                placeholder="Ingresa tu contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-white/95 border-0 pr-10 h-11 sm:h-12"
@@ -118,7 +118,7 @@ export function LoginPage() {
           )}
 
           <Button type="submit" className="w-full h-11 sm:h-12 text-base font-semibold">
-            Iniciar sesion
+            Iniciar sesión
           </Button>
         </form>
 

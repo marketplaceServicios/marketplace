@@ -10,7 +10,7 @@ import { DynamicFieldList } from '@/components/shared/DynamicFieldList'
 import { PhotoGallery } from '@/components/shared/PhotoGallery'
 import { usePlanesStore } from '@/store/planesStore'
 import { useCategoriasStore } from '@/store/categoriasStore'
-import { Save, ArrowLeft } from 'lucide-react'
+import { Save, ArrowLeft, Info } from 'lucide-react'
 
 export function CrearPlanPage() {
   const navigate = useNavigate()
@@ -21,7 +21,10 @@ export function CrearPlanPage() {
     titulo: '',
     descripcion: '',
     valor: '',
-    categoria: ''
+    categoria: '',
+    accesibilidad: '',
+    notasAccesibilidad: '',
+    politicasCancelacion: ''
   })
 
   const [detalles, setDetalles] = useState([
@@ -41,6 +44,13 @@ export function CrearPlanPage() {
     setFormData({
       ...formData,
       categoria: value
+    })
+  }
+
+  const handleAccesibilidadChange = (value) => {
+    setFormData({
+      ...formData,
+      accesibilidad: value
     })
   }
 
@@ -108,7 +118,7 @@ export function CrearPlanPage() {
             <Card>
               <CardContent className="p-6 space-y-4">
                 <FormField
-                  label="Titulo del plan"
+                  label="Título del plan"
                   name="titulo"
                   value={formData.titulo}
                   onChange={handleChange}
@@ -117,7 +127,7 @@ export function CrearPlanPage() {
                 />
 
                 <FormTextarea
-                  label="Descripcion amplia"
+                  label="Descripción amplia"
                   name="descripcion"
                   value={formData.descripcion}
                   onChange={handleChange}
@@ -148,7 +158,7 @@ export function CrearPlanPage() {
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-primary mb-4">
-                  Galeria de fotos
+                  Galería de fotos
                 </h3>
                 <PhotoGallery
                   photos={fotos}
@@ -180,14 +190,60 @@ export function CrearPlanPage() {
                 </div>
 
                 <FormSelect
-                  label="Categoria"
+                  label="Categoría"
                   name="categoria"
                   value={formData.categoria}
                   onChange={handleCategoriaChange}
                   options={categoriaOptions}
-                  placeholder="Selecciona una categoria"
+                  placeholder="Selecciona una categoría"
                   required
                 />
+
+                {/* Accesibilidad */}
+                <div className="pt-4 border-t border-cream">
+                  <h4 className="text-sm font-semibold text-primary mb-3">Accesibilidad</h4>
+                  <FormSelect
+                    label="Nivel de accesibilidad"
+                    name="accesibilidad"
+                    value={formData.accesibilidad}
+                    onChange={handleAccesibilidadChange}
+                    options={[
+                      { value: 'Alta', label: 'Alta' },
+                      { value: 'Media', label: 'Media' },
+                      { value: 'Por confirmar', label: 'Por confirmar' }
+                    ]}
+                    placeholder="Selecciona un nivel"
+                  />
+                  <FormTextarea
+                    label="Notas de accesibilidad"
+                    name="notasAccesibilidad"
+                    value={formData.notasAccesibilidad}
+                    onChange={handleChange}
+                    placeholder="Describe accesos, rampas, distancias, terreno..."
+                    rows={3}
+                    className="mt-3"
+                  />
+                </div>
+
+                {/* Políticas */}
+                <div className="pt-4 border-t border-cream">
+                  <FormTextarea
+                    label="Políticas de cambios y cancelación"
+                    name="politicasCancelacion"
+                    value={formData.politicasCancelacion}
+                    onChange={handleChange}
+                    placeholder="Describe las condiciones de cambio y cancelación de este plan..."
+                    rows={3}
+                  />
+                </div>
+
+                {/* Tip box */}
+                <div className="p-4 bg-ivory/50 rounded-lg flex items-start gap-3">
+                  <Info className="h-5 w-5 text-sage mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-slate">
+                    Tip: describe accesos, distancias y ritmos. Eso reduce dudas y aumenta cierres.
+                  </p>
+                </div>
               </CardContent>
             </Card>
 

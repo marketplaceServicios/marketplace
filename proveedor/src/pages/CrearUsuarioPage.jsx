@@ -81,7 +81,7 @@ export function CrearUsuarioPage() {
   }
 
   const handleDelete = () => {
-    if (editId && confirm('¿Estas seguro de eliminar este usuario?')) {
+    if (editId && confirm('¿Estás seguro de eliminar este usuario?')) {
       deleteMiembro(parseInt(editId))
       navigate('/equipo')
     }
@@ -152,11 +152,11 @@ export function CrearUsuarioPage() {
               />
 
               <FormField
-                label="Direccion"
+                label="Dirección"
                 name="direccion"
                 value={formData.direccion}
                 onChange={handleChange}
-                placeholder="Direccion completa"
+                placeholder="Dirección completa"
               />
 
               <FormSelect
