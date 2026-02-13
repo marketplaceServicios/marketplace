@@ -1,9 +1,10 @@
-name: Deploy Proveedor to Hostinger
+name: Deploy to Hostinger
 
 on:
   push:
     branches: [main]
     paths:
+      - 'admin/**'
       - 'proveedor/**'
 
 jobs:
@@ -12,9 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy Proveedor to Hostinger
+      - name: Deploy to Hostinger
         uses: hostinger/deploy-on-vps@v2
         with:
           api-key: ${{ vars.HOSTINGER_API_KEY }}
           virtual-machine: ${{ vars.HOSTINGER_VM_ID }}
-          working-directory: proveedor
