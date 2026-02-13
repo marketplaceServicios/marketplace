@@ -26,7 +26,7 @@ export function UsuariosRegistradosPage() {
 
   return (
     <div>
-      <PageHeader title="Consulta informacion de los equipos de trabajo" />
+      <PageHeader title="Usuarios registrados" subtitle="Consulta información de los equipos de trabajo" />
 
       {/* Filter */}
       <div className="mb-6">

@@ -72,12 +72,12 @@ export function InfoProveedorPage() {
         />
         <InfoRow
           icon={MapPin}
-          label="Direccion"
+          label="Dirección"
           value={empresa.direccion}
         />
         <InfoRow
           icon={Phone}
-          label="Telefono fijo"
+          label="Teléfono fijo"
           value={empresa.telefonoFijo}
         />
         <InfoRow
@@ -123,7 +123,7 @@ export function InfoProveedorPage() {
           variant="default"
           onClick={() => navigate(`/proveedor/${id}/documentos`)}
         >
-          Ver documentacion
+          Ver documentación
         </Button>
       </div>
     </div>

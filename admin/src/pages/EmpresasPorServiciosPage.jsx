@@ -28,7 +28,7 @@ export function EmpresasPorServiciosPage() {
 
   return (
     <div>
-      <PageHeader title="Tipo de servicios activos en la plataforma" />
+      <PageHeader title="Proveedores" subtitle="Asegura estándares: documentación, accesibilidad, políticas y contenido real." />
 
       {/* Filter */}
       <div className="mb-6">

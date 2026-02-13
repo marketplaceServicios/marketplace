@@ -23,8 +23,8 @@ const menuItems = [
   { icon: Home, label: 'Dashboard', path: '/' },
   { icon: FileText, label: 'Planes existentes', path: '/planes' },
   { icon: Plus, label: 'Crear plan', path: '/crear-plan' },
-  { icon: Grid3X3, label: 'Categorias', path: '/categorias' },
-  { icon: PlusCircle, label: 'Crear categorias', path: '/crear-categoria' },
+  { icon: Grid3X3, label: 'Categorías', path: '/categorias' },
+  { icon: PlusCircle, label: 'Crear categorías', path: '/crear-categoria' },
   { icon: Calendar, label: 'Reservas activas', path: '/reservas' },
   {
     icon: DollarSign,
@@ -173,7 +173,7 @@ export function Sidebar() {
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-danger hover:bg-white/10 transition-colors w-full"
           >
             <LogOut className="w-5 h-5" />
-            <span className="text-sm">Cerrar sesion</span>
+            <span className="text-sm">Cerrar sesión</span>
           </button>
         </div>
       </aside>

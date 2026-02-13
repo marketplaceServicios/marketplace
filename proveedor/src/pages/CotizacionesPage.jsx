@@ -30,8 +30,8 @@ export function CotizacionesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Cotizaciones por responder"
-        subtitle="Gestiona las solicitudes de tus clientes"
+        title="Cotizaciones"
+        subtitle="Responde con claridad. Ofrece 2–3 opciones simples para facilitar la decisión de la familia."
       />
 
       {/* Filter Tabs */}

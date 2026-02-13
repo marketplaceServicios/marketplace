@@ -61,8 +61,8 @@ export function LoginPage() {
                 className="h-36 object-contain"
               />
             </div>
-            <h2 className="text-2xl font-bold text-primary font-serif">Bienvenido</h2>
-            <p className="text-slate">Ingresa a tu cuenta de proveedor</p>
+            <h2 className="text-2xl font-bold text-primary font-serif">Bienvenido a Vive Silver</h2>
+            <p className="text-slate">Tu vitrina confiable para clientes 50+ y sus familias. Gestiona planes, reservas y cotizaciones en un solo lugar.</p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -74,7 +74,7 @@ export function LoginPage() {
 
               <div className="space-y-1">
                 <label className="text-sm font-medium text-primary">
-                  Correo electronico
+                  Correo electrónico
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate" />
@@ -91,7 +91,7 @@ export function LoginPage() {
 
               <div className="space-y-1">
                 <label className="text-sm font-medium text-primary">
-                  Contrasena
+                  Contraseña
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate" />
@@ -126,12 +126,12 @@ export function LoginPage() {
                   <span className="text-slate">Recordarme</span>
                 </label>
                 <a href="#" className="text-accent hover:underline">
-                  Olvidaste tu contrasena?
+                  ¿Olvidaste tu contraseña? Te ayudamos a recuperarla.
                 </a>
               </div>
 
               <Button type="submit" className="w-full" size="lg">
-                Iniciar sesion
+                Ingresar
               </Button>
             </form>
           </CardContent>

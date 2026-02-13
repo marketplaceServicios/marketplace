@@ -109,7 +109,7 @@ export function PerfilPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-muted mb-2">Direccion</label>
+            <label className="block text-sm text-muted mb-2">Dirección</label>
             <Input
               value={formData.direccion}
               onChange={(e) => handleChange('direccion')(e.target.value)}

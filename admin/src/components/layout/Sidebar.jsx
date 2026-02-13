@@ -9,7 +9,9 @@ import {
   User,
   LogOut,
   Menu,
-  X
+  X,
+  FileText,
+  BookOpen
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/lib/utils'
@@ -17,10 +19,12 @@ import logo from '@/assets/images/logo/blanco.png'
 
 const menuItems = [
   { path: '/', icon: Home, label: 'Dashboard' },
-  { path: '/empresas-por-servicios', icon: Building2, label: 'Empresas por servicios' },
+  { path: '/empresas-por-servicios', icon: Building2, label: 'Proveedores' },
   { path: '/usuarios-registrados', icon: Users, label: 'Usuarios registrados' },
   { path: '/crear-empresa', icon: Plus, label: 'Crear empresa' },
   { path: '/crear-tipo-servicio', icon: PlusCircle, label: 'Crear tipo de servicio' },
+  { path: '/planes-admin', icon: FileText, label: 'Planes' },
+  { path: '/contenido', icon: BookOpen, label: 'Contenido' },
   { path: '/perfil', icon: User, label: 'Mi perfil' },
 ]
 
@@ -42,7 +46,7 @@ export function Sidebar() {
       <button
         onClick={() => setIsOpen(true)}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-primary text-white shadow-lg hover:bg-primary-light transition-colors"
-        aria-label="Abrir menu"
+        aria-label="Abrir menú"
       >
         <Menu className="w-6 h-6" />
       </button>
@@ -67,7 +71,7 @@ export function Sidebar() {
         <button
           onClick={closeSidebar}
           className="lg:hidden absolute top-4 right-4 p-1 text-white/70 hover:text-white"
-          aria-label="Cerrar menu"
+          aria-label="Cerrar menú"
         >
           <X className="w-5 h-5" />
         </button>
@@ -110,7 +114,7 @@ export function Sidebar() {
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-danger hover:bg-white/10 w-full transition-colors"
           >
             <LogOut className="w-5 h-5 flex-shrink-0" />
-            <span>Cerrar sesion</span>
+            <span>Cerrar sesión</span>
           </button>
         </div>
       </aside>

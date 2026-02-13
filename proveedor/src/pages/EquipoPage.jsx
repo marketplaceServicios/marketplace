@@ -37,8 +37,8 @@ export function EquipoPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Equipo"
-        subtitle="Gestiona los miembros de tu equipo"
+        title="Tu equipo"
+        subtitle="Asigna roles para responder solicitudes y gestionar reservas con orden."
         action={
           <Button onClick={() => navigate('/equipo/crear')}>
             <Plus className="h-4 w-4 mr-2" />

@@ -65,7 +65,7 @@ export function CrearCategoriaPage() {
   }
 
   const handleDelete = () => {
-    if (editId && confirm('¿Estas seguro de eliminar esta categoria?')) {
+    if (editId && confirm('¿Estás seguro de eliminar esta categoría?')) {
       deleteCategoria(parseInt(editId))
       navigate('/categorias')
     }
@@ -76,8 +76,8 @@ export function CrearCategoriaPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEditing ? 'Edita tu categoria' : 'Crea una categoria'}
-        subtitle={isEditing ? 'Modifica los datos de la categoria' : 'Agrega una nueva categoria para tus planes'}
+        title={isEditing ? 'Edita tu categoría' : 'Crea una categoría'}
+        subtitle={isEditing ? 'Modifica los datos de la categoría' : 'Agrega una nueva categoría para tus planes'}
         action={
           <Button variant="ghost" onClick={() => navigate('/categorias')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -91,7 +91,7 @@ export function CrearCategoriaPage() {
           <Card>
             <CardContent className="p-6 space-y-6">
               <FormField
-                label="Titulo de la categoria"
+                label="Título de la categoría"
                 name="nombre"
                 value={formData.nombre}
                 onChange={handleChange}
@@ -100,11 +100,11 @@ export function CrearCategoriaPage() {
               />
 
               <FormTextarea
-                label="Descripcion amplia"
+                label="Descripción amplia"
                 name="descripcion"
                 value={formData.descripcion}
                 onChange={handleChange}
-                placeholder="Describe esta categoria..."
+                placeholder="Describe esta categoría..."
                 variant="highlight"
                 rows={5}
                 required

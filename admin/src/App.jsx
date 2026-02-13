@@ -11,6 +11,8 @@ import { CrearEmpresaPage } from '@/pages/CrearEmpresaPage'
 import { CrearRepresentantePage } from '@/pages/CrearRepresentantePage'
 import { CrearServicioPage } from '@/pages/CrearServicioPage'
 import { PerfilPage } from '@/pages/PerfilPage'
+import { PlanesAdminPage } from '@/pages/PlanesAdminPage'
+import { ContenidoPage } from '@/pages/ContenidoPage'
 import { useAuthStore } from '@/store/authStore'
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
         <Route path="/crear-empresa" element={<CrearEmpresaPage />} />
         <Route path="/crear-empresa/representante" element={<CrearRepresentantePage />} />
         <Route path="/crear-tipo-servicio" element={<CrearServicioPage />} />
+        <Route path="/planes-admin" element={<PlanesAdminPage />} />
+        <Route path="/contenido" element={<ContenidoPage />} />
         <Route path="/perfil" element={<PerfilPage />} />
       </Route>
 

@@ -23,7 +23,7 @@ export function InfoRepresentantePage() {
   if (!empresa || !representante) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted">Informacion no encontrada</p>
+        <p className="text-muted">Información no encontrada</p>
         <Button
           variant="outline"
           onClick={() => navigate('/empresas-por-servicios')}

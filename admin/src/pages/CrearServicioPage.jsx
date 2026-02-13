@@ -23,7 +23,7 @@ export function CrearServicioPage() {
 
   const handleSubmit = () => {
     if (!formData.titulo.trim()) {
-      alert('Por favor ingresa un titulo para el servicio')
+      alert('Por favor ingresa un título para el servicio')
       return
     }
 
@@ -45,7 +45,7 @@ export function CrearServicioPage() {
         <Input
           value={formData.titulo}
           onChange={(e) => handleChange('titulo')(e.target.value)}
-          placeholder="Escribe el titulo de tu nueva categoria"
+          placeholder="Escribe el título de tu nueva categoría"
           className="bg-accent-light border-0 h-12"
         />
 
@@ -53,7 +53,7 @@ export function CrearServicioPage() {
         <Textarea
           value={formData.descripcion}
           onChange={(e) => handleChange('descripcion')(e.target.value)}
-          placeholder="Escribe una descripcion amplia"
+          placeholder="Escribe una descripción amplia"
           className="min-h-[200px]"
         />
 

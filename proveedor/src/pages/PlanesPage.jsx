@@ -27,12 +27,12 @@ export function PlanesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Planes activos"
-        subtitle="Gestiona todos tus planes y servicios"
+        title="Tus planes"
+        subtitle="Publica experiencias claras y completas. Entre más información útil, más confianza y mejores cierres."
         action={
           <Button onClick={() => navigate('/crear-plan')}>
             <Plus className="h-4 w-4 mr-2" />
-            Nuevo plan
+            Crear nuevo plan
           </Button>
         }
       />

@@ -55,7 +55,7 @@ export function CrearEmpresaPage() {
           label="Nombre de la empresa:"
           value={formData.nombre}
           onChange={handleChange('nombre')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormSelect
@@ -72,24 +72,24 @@ export function CrearEmpresaPage() {
           label="NIT de la empresa:"
           value={formData.nit}
           onChange={handleChange('nit')}
-          placeholder="Numero"
+          placeholder="Número"
           type="text"
         />
 
         <FormField
           icon={MapPin}
-          label="Direccion"
+          label="Dirección"
           value={formData.direccion}
           onChange={handleChange('direccion')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormField
           icon={Phone}
-          label="Telefono fijo"
+          label="Teléfono fijo"
           value={formData.telefonoFijo}
           onChange={handleChange('telefonoFijo')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormField
@@ -97,7 +97,7 @@ export function CrearEmpresaPage() {
           label="Celular"
           value={formData.celular}
           onChange={handleChange('celular')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
         />
 
         <FormField
@@ -105,7 +105,7 @@ export function CrearEmpresaPage() {
           label="Correo"
           value={formData.correo}
           onChange={handleChange('correo')}
-          placeholder="Descripcion"
+          placeholder="Descripción"
           type="email"
         />
 
