@@ -1,43 +1,39 @@
 import { create } from 'zustand'
+import { api } from '@/lib/api'
 
 export const useAuthStore = create((set) => ({
-  user: {
-    id: 1,
-    nombre: 'Sandra Bones',
-    username: '@Sandra.Bones',
-    email: 'sandra.bones@company.io',
-    celular: '+57 111 222 3334',
-    fechaNacimiento: '10/11/1997',
-    direccion: '12/ A Street Name, Manizales, Colombia',
-    rol: 'Administrador',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
-  },
-  isAuthenticated: true,
+  user: null,
+  isAuthenticated: false,
 
-  login: (email, password) => {
-    set({
-      isAuthenticated: true,
-      user: {
-        id: 1,
-        nombre: 'Sandra Bones',
-        username: '@Sandra.Bones',
-        email: email,
-        celular: '+57 111 222 3334',
-        fechaNacimiento: '10/11/1997',
-        direccion: '12/ A Street Name, Manizales, Colombia',
-        rol: 'Administrador',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
-      }
-    })
+  init: async () => {
+    const token = localStorage.getItem('proveedor_token')
+    if (!token) return
+    try {
+      const user = await api.get('/auth/profile')
+      set({ user, isAuthenticated: true })
+    } catch {
+      localStorage.removeItem('proveedor_token')
+    }
+  },
+
+  login: async (email, password) => {
+    const data = await api.post('/auth/proveedor/login', { email, password })
+    localStorage.setItem('proveedor_token', data.token)
+    set({ user: data.user, isAuthenticated: true })
+    return data.user
+  },
+
+  confirmPasswordChanged: async (newPassword) => {
+    await api.post('/auth/proveedor/change-password', { newPassword })
+    set((state) => ({ user: { ...state.user, mustChangePassword: false } }))
   },
 
   logout: () => {
-    set({ isAuthenticated: false, user: null })
+    localStorage.removeItem('proveedor_token')
+    set({ user: null, isAuthenticated: false })
   },
 
   updateProfile: (data) => {
-    set((state) => ({
-      user: { ...state.user, ...data }
-    }))
+    set((state) => ({ user: { ...state.user, ...data } }))
   }
 }))

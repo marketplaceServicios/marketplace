@@ -68,22 +68,29 @@ export function CrearUsuarioPage() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (editId) {
-      updateMiembro(parseInt(editId), formData)
-    } else {
-      addMiembro(formData)
+    try {
+      if (editId) {
+        await updateMiembro(parseInt(editId), formData)
+      } else {
+        await addMiembro(formData)
+      }
+      navigate('/equipo')
+    } catch (err) {
+      console.error('Error al guardar miembro:', err)
     }
-
-    navigate('/equipo')
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (editId && confirm('¿Estás seguro de eliminar este usuario?')) {
-      deleteMiembro(parseInt(editId))
-      navigate('/equipo')
+      try {
+        await deleteMiembro(parseInt(editId))
+        navigate('/equipo')
+      } catch (err) {
+        console.error('Error al eliminar miembro:', err)
+      }
     }
   }
 

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { TeamMemberCard } from '@/components/shared/TeamMemberCard'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -11,7 +12,10 @@ import { useNavigate } from 'react-router-dom'
 export function EquipoPage() {
   const navigate = useNavigate()
 
+  const fetchEquipo = useEquipoStore((state) => state.fetchEquipo)
   const filtroRol = useEquipoStore((state) => state.filtroRol)
+  useEffect(() => { fetchEquipo() }, [])
+
   const busqueda = useEquipoStore((state) => state.busqueda)
   const setFiltroRol = useEquipoStore((state) => state.setFiltroRol)
   const setBusqueda = useEquipoStore((state) => state.setBusqueda)

@@ -1,24 +1,62 @@
+import { useEffect, useState } from 'react'
 import { StatsCard } from '@/components/shared/StatsCard'
 import { ActivityPanel } from '@/components/shared/ActivityPanel'
 import { PieChart } from '@/components/charts/PieChart'
 import { BarChart } from '@/components/charts/BarChart'
-import { dashboardData } from '@/data/mockData'
 import { Clock, FileText, Calendar, AlertCircle } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { api } from '@/lib/api'
+
+const COLORES_SERVICIOS = ['#F5A524', '#EF4444', '#10B981', '#6366F1', '#8B5CF6', '#0EA5E9', '#F97316']
 
 export function DashboardPage() {
-  const activityItems = [
-    { value: dashboardData.actividad.empresasUltimoMes, label: 'Empresas asociadas en el último mes' },
-    { value: dashboardData.actividad.empresasActivas, label: 'Empresas activas en la plataforma' },
-    { value: dashboardData.actividad.serviciosAsociados, label: 'Cantidad de servicios asociados a la plataforma' },
-  ]
+  const [stats, setStats] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.get('/admin/dashboard')
+      .then(setStats)
+      .catch(console.error)
+      .finally(() => setLoading(false))
+  }, [])
+
+  const activityItems = stats ? [
+    { value: stats.proveedores.total, label: 'Empresas registradas en la plataforma' },
+    { value: stats.proveedores.activos, label: 'Empresas activas en la plataforma' },
+    { value: stats.planes, label: 'Planes activos publicados' },
+    { value: stats.usuarios, label: 'Usuarios registrados en la web' },
+  ] : []
+
+  const reservasPendientes = stats?.reservas?.porEstado?.find(r => r.estado === 'pendiente')?._count?.estado || 0
+  const reservasEnCurso = stats?.reservas?.porEstado?.find(r => r.estado === 'confirmada')?._count?.estado || 0
+  const proveedoresInactivos = (stats?.proveedores?.total || 0) - (stats?.proveedores?.activos || 0)
 
   const adminStats = [
-    { label: 'Proveedores pendientes de aprobación', count: 0, icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-    { label: 'Planes por revisar', count: 0, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Reservas en curso', count: 0, icon: Calendar, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'Incidencias y soporte', count: 0, icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-50' },
+    { label: 'Proveedores inactivos', count: proveedoresInactivos, icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-50' },
+    { label: 'Planes por revisar', count: stats?.planes || 0, icon: FileText, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Reservas en curso', count: reservasEnCurso, icon: Calendar, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'Reservas pendientes', count: reservasPendientes, icon: AlertCircle, color: 'text-red-600', bg: 'bg-red-50' },
   ]
+
+  // Datos para gráficos (placeholders con datos reales cuando estén disponibles)
+  const serviciosActivos = [
+    { name: 'Proveedores activos', value: stats?.proveedores?.activos || 0, color: COLORES_SERVICIOS[0] },
+    { name: 'Proveedores inactivos', value: (stats?.proveedores?.total || 0) - (stats?.proveedores?.activos || 0), color: COLORES_SERVICIOS[1] },
+  ]
+
+  const reservasPorEstado = (stats?.reservas?.porEstado || []).map((r, i) => ({
+    name: r.estado,
+    empresas: r._count.estado,
+    color: COLORES_SERVICIOS[i % COLORES_SERVICIOS.length]
+  }))
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted">Cargando datos...</p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col xl:flex-row gap-6 lg:gap-8">
@@ -47,16 +85,14 @@ export function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          {/* Pie Chart Card */}
-          <StatsCard title="Tipos de servicios activos en la plataforma" className="card-hover">
-            <PieChart data={dashboardData.serviciosActivos} />
+          <StatsCard title="Estado de proveedores" className="card-hover">
+            <PieChart data={serviciosActivos} />
           </StatsCard>
 
-          {/* Bar Chart Card */}
-          <StatsCard title="Empresas inscritas por tipo de servicio" className="card-hover">
+          <StatsCard title="Reservas por estado" className="card-hover">
             <BarChart
-              data={dashboardData.empresasPorServicio}
-              title="KPI 1"
+              data={reservasPorEstado}
+              title="Reservas"
               dataKey="empresas"
             />
           </StatsCard>

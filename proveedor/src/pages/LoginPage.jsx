@@ -25,7 +25,7 @@ export function LoginPage() {
     setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!formData.email || !formData.password) {
@@ -33,9 +33,12 @@ export function LoginPage() {
       return
     }
 
-    // Simulated login
-    login(formData.email, formData.password)
-    navigate('/')
+    try {
+      await login(formData.email, formData.password)
+      navigate('/')
+    } catch {
+      setError('Credenciales incorrectas. Verifica tu correo y contraseña.')
+    }
   }
 
   return (

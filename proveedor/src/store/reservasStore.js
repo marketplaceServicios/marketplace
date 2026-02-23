@@ -1,14 +1,40 @@
 import { create } from 'zustand'
-import { mockReservas } from '@/data/mockData'
+import { api } from '@/lib/api'
+
+const COLORS = ['teal', 'green', 'blue', 'amber', 'purple', 'pink']
+
+const mapReserva = (r, i) => ({
+  id: r.id,
+  codigo: r.codigo,
+  fecha: r.createdAt?.split('T')[0] || '',
+  servicio: r.plan?.titulo || '—',
+  cliente: r.usuario?.nombre || '—',
+  cantidadPersonas: r.numPersonas,
+  valorPagado: Number(r.total),
+  estado: r.estado,
+  color: COLORS[i % COLORS.length],
+  turistas: r.turistas || [],
+  metodoPago: r.metodoPago || '—',
+})
 
 export const useReservasStore = create((set, get) => ({
-  reservas: mockReservas,
+  reservas: [],
   selectedDate: null,
   fechasBloqueadas: [],
+  loading: false,
 
-  setSelectedDate: (date) => {
-    set({ selectedDate: date })
+  fetchReservas: async () => {
+    set({ loading: true })
+    try {
+      const data = await api.get('/reservas')
+      set({ reservas: data.map(mapReserva), loading: false })
+    } catch (err) {
+      console.error('Error al cargar reservas:', err)
+      set({ loading: false })
+    }
   },
+
+  setSelectedDate: (date) => set({ selectedDate: date }),
 
   getReservasByDate: (date) => {
     const reservas = get().reservas
@@ -25,20 +51,19 @@ export const useReservasStore = create((set, get) => ({
     })
   },
 
+  cambiarEstado: async (id, estado) => {
+    await api.patch(`/reservas/${id}/estado`, { estado })
+    set((state) => ({
+      reservas: state.reservas.map((r) =>
+        r.id === id ? { ...r, estado } : r
+      )
+    }))
+  },
+
   bloquearFecha: (date) => {
     const dateStr = date.toISOString().split('T')[0]
     set((state) => ({
       fechasBloqueadas: [...state.fechasBloqueadas, dateStr]
     }))
   },
-
-  addReserva: (reserva) => {
-    const newReserva = {
-      ...reserva,
-      id: Date.now()
-    }
-    set((state) => ({
-      reservas: [...state.reservas, newReserva]
-    }))
-  }
 }))

@@ -15,6 +15,7 @@ export function CrearCategoriaPage() {
   const editId = searchParams.get('id')
 
   const categorias = useCategoriasStore((state) => state.categorias)
+  const fetchCategorias = useCategoriasStore((state) => state.fetchCategorias)
   const addCategoria = useCategoriasStore((state) => state.addCategoria)
   const updateCategoria = useCategoriasStore((state) => state.updateCategoria)
   const deleteCategoria = useCategoriasStore((state) => state.deleteCategoria)
@@ -24,6 +25,10 @@ export function CrearCategoriaPage() {
     descripcion: '',
     imagen: ''
   })
+
+  useEffect(() => {
+    if (categorias.length === 0) fetchCategorias()
+  }, [])
 
   useEffect(() => {
     if (editId) {
@@ -52,22 +57,29 @@ export function CrearCategoriaPage() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (editId) {
-      updateCategoria(parseInt(editId), formData)
-    } else {
-      addCategoria(formData)
+    try {
+      if (editId) {
+        await updateCategoria(parseInt(editId), formData)
+      } else {
+        await addCategoria(formData)
+      }
+      navigate('/categorias')
+    } catch (err) {
+      console.error('Error al guardar categoría:', err)
     }
-
-    navigate('/categorias')
   }
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (editId && confirm('¿Estás seguro de eliminar esta categoría?')) {
-      deleteCategoria(parseInt(editId))
-      navigate('/categorias')
+      try {
+        await deleteCategoria(parseInt(editId))
+        navigate('/categorias')
+      } catch (err) {
+        console.error('Error al eliminar categoría:', err)
+      }
     }
   }
 

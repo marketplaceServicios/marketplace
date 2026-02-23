@@ -44,7 +44,7 @@ export function FormSelect({
           {options.map((option) => (
             <SelectItem
               key={option.value}
-              value={option.value}
+              value={String(option.value)}
             >
               {option.label}
             </SelectItem>

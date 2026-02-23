@@ -5,7 +5,6 @@ import {
   FileText,
   Plus,
   Grid3X3,
-  PlusCircle,
   Calendar,
   DollarSign,
   Users,
@@ -24,15 +23,14 @@ const menuItems = [
   { icon: FileText, label: 'Planes existentes', path: '/planes' },
   { icon: Plus, label: 'Crear plan', path: '/crear-plan' },
   { icon: Grid3X3, label: 'Categorías', path: '/categorias' },
-  { icon: PlusCircle, label: 'Crear categorías', path: '/crear-categoria' },
   { icon: Calendar, label: 'Reservas activas', path: '/reservas' },
   {
     icon: DollarSign,
     label: 'Cotizaciones',
     path: '/cotizaciones',
     submenu: [
+      { label: 'Todas', path: '/cotizaciones/todas' },
       { label: 'Pendientes', path: '/cotizaciones' },
-      { label: 'Detalle', path: '/cotizaciones/1' }
     ]
   },
   { icon: Users, label: 'Equipo', path: '/equipo' },
@@ -126,6 +124,7 @@ export function Sidebar() {
                         {item.submenu.map((subitem) => (
                           <li key={subitem.path}>
                             <NavLink
+                              end
                               to={subitem.path}
                               onClick={() => setIsOpen(false)}
                               className={({ isActive }) =>

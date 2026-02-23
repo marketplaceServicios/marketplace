@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -13,11 +14,23 @@ import { useNavigate } from 'react-router-dom'
 export function DashboardPage() {
   const navigate = useNavigate()
   const planes = usePlanesStore((state) => state.planes)
+  const fetchPlanes = usePlanesStore((state) => state.fetchPlanes)
   const reservas = useReservasStore((state) => state.reservas)
+  const fetchReservas = useReservasStore((state) => state.fetchReservas)
+  const cotizaciones = useCotizacionesStore((state) => state.cotizaciones)
+  const fetchCotizaciones = useCotizacionesStore((state) => state.fetchCotizaciones)
   const getCotizacionesSinResponder = useCotizacionesStore(
     (state) => state.getCotizacionesSinResponder
   )
+
+  useEffect(() => {
+    fetchPlanes()
+    fetchReservas()
+    fetchCotizaciones()
+  }, [])
+
   const cotizacionesPendientes = getCotizacionesSinResponder()
+  const cotizacionesResueltas = cotizaciones.filter((c) => c.resuelta).length
 
   // Data for bar chart - reservations per month
   const reservasBarData = [
@@ -128,7 +141,7 @@ export function DashboardPage() {
         <div className="lg:col-span-1">
           <ActivityPanel
             planesDisponibles={planes.length}
-            cotizacionesResueltas={10}
+            cotizacionesResueltas={cotizacionesResueltas}
             reservasActivas={reservas.length}
           />
         </div>

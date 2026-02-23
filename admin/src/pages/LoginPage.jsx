@@ -15,7 +15,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
@@ -24,11 +24,11 @@ export function LoginPage() {
       return
     }
 
-    const success = login(email, password)
-    if (success) {
+    try {
+      await login(email, password)
       navigate('/')
-    } else {
-      setError('Credenciales incorrectas')
+    } catch (err) {
+      setError(err.message || 'Credenciales incorrectas')
     }
   }
 

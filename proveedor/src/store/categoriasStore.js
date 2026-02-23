@@ -1,31 +1,19 @@
 import { create } from 'zustand'
-import { mockCategorias } from '@/data/mockData'
+import { api } from '@/lib/api'
 
 export const useCategoriasStore = create((set) => ({
-  categorias: mockCategorias,
+  categorias: [],
+  loading: false,
 
-  addCategoria: (categoria) => {
-    const newCategoria = {
-      ...categoria,
-      id: Date.now(),
-      createdAt: new Date().toISOString()
+  // Las categorías son globales (admin las gestiona). Solo lectura para el proveedor.
+  fetchCategorias: async () => {
+    set({ loading: true })
+    try {
+      const data = await api.get('/categorias')
+      set({ categorias: data, loading: false })
+    } catch (err) {
+      console.error('Error al cargar categorías:', err)
+      set({ loading: false })
     }
-    set((state) => ({
-      categorias: [...state.categorias, newCategoria]
-    }))
-  },
-
-  updateCategoria: (id, data) => {
-    set((state) => ({
-      categorias: state.categorias.map((cat) =>
-        cat.id === id ? { ...cat, ...data } : cat
-      )
-    }))
-  },
-
-  deleteCategoria: (id) => {
-    set((state) => ({
-      categorias: state.categorias.filter((cat) => cat.id !== id)
-    }))
   }
 }))
