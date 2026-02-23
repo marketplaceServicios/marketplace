@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const adminController = require('../controllers/adminController')
 const contactoController = require('../controllers/contactoController')
+const testimonioController = require('../controllers/testimonioController')
 const { verifyToken, isAdmin } = require('../middlewares/auth')
 
 // Todas las rutas requieren ser admin
@@ -22,6 +23,12 @@ router.get('/cotizaciones', adminController.getCotizaciones)
 // Mensajes de contacto
 router.get('/contactos', contactoController.getAll)
 router.patch('/contactos/:id/leido', contactoController.marcarLeido)
+
+// Testimonios
+router.get('/testimonios', testimonioController.getAllAdmin)
+router.post('/testimonios', testimonioController.create)
+router.put('/testimonios/:id', testimonioController.update)
+router.delete('/testimonios/:id', testimonioController.remove)
 
 // Gestión de planes
 router.get('/planes', adminController.getPlanes)
