@@ -1,4 +1,5 @@
 const prisma = require('../config/database')
+const slugify = require('../utils/slugify')
 
 // Dashboard del admin - estadísticas generales
 const getDashboard = async (req, res) => {
@@ -87,8 +88,16 @@ const createCategoria = async (req, res) => {
       return res.status(400).json({ error: 'El nombre es requerido' })
     }
 
+    let slug = slugify(nombre)
+    let suffix = 0
+    let candidate = slug
+    while (await prisma.categoria.findUnique({ where: { slug: candidate } })) {
+      suffix++
+      candidate = `${slug}-${suffix}`
+    }
+
     const categoria = await prisma.categoria.create({
-      data: { nombre, descripcion, imagen, icono, proveedorId: null }
+      data: { nombre, descripcion, imagen, icono, slug: candidate, proveedorId: null }
     })
 
     res.status(201).json({ message: 'Categoría creada exitosamente', categoria })
@@ -111,9 +120,25 @@ const updateCategoria = async (req, res) => {
       return res.status(404).json({ error: 'Categoría no encontrada' })
     }
 
+    const data = { nombre, descripcion, imagen, icono, activo }
+
+    // Regenerate slug if nombre changed
+    if (nombre && nombre !== existing.nombre) {
+      let slug = slugify(nombre)
+      let suffix = 0
+      let candidate = slug
+      while (true) {
+        const found = await prisma.categoria.findUnique({ where: { slug: candidate } })
+        if (!found || found.id === parseInt(id)) break
+        suffix++
+        candidate = `${slug}-${suffix}`
+      }
+      data.slug = candidate
+    }
+
     const categoria = await prisma.categoria.update({
       where: { id: parseInt(id) },
-      data: { nombre, descripcion, imagen, icono, activo }
+      data
     })
 
     res.json({ message: 'Categoría actualizada exitosamente', categoria })
