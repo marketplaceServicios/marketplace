@@ -10,13 +10,22 @@ import { UsuariosRegistradosPage } from '@/pages/UsuariosRegistradosPage'
 import { CrearEmpresaPage } from '@/pages/CrearEmpresaPage'
 import { CrearRepresentantePage } from '@/pages/CrearRepresentantePage'
 import { CrearServicioPage } from '@/pages/CrearServicioPage'
+import { CategoriasAdminPage } from '@/pages/CategoriasAdminPage'
 import { PerfilPage } from '@/pages/PerfilPage'
 import { PlanesAdminPage } from '@/pages/PlanesAdminPage'
+import { CotizacionesAdminPage } from '@/pages/CotizacionesAdminPage'
+import { MensajesPage } from '@/pages/MensajesPage'
 import { ContenidoPage } from '@/pages/ContenidoPage'
+import { useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const init = useAuthStore((state) => state.init)
+
+  useEffect(() => {
+    init()
+  }, [])
 
   return (
     <Routes>
@@ -39,7 +48,10 @@ function App() {
         <Route path="/crear-empresa" element={<CrearEmpresaPage />} />
         <Route path="/crear-empresa/representante" element={<CrearRepresentantePage />} />
         <Route path="/crear-tipo-servicio" element={<CrearServicioPage />} />
+        <Route path="/categorias" element={<CategoriasAdminPage />} />
         <Route path="/planes-admin" element={<PlanesAdminPage />} />
+        <Route path="/cotizaciones" element={<CotizacionesAdminPage />} />
+        <Route path="/mensajes" element={<MensajesPage />} />
         <Route path="/contenido" element={<ContenidoPage />} />
         <Route path="/perfil" element={<PerfilPage />} />
       </Route>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -25,8 +25,11 @@ export function ReservasPage() {
   const [selectedDate, setSelectedDate] = useState(null)
 
   const reservas = useReservasStore((state) => state.reservas)
+  const fetchReservas = useReservasStore((state) => state.fetchReservas)
   const getReservasByDate = useReservasStore((state) => state.getReservasByDate)
   const bloquearFecha = useReservasStore((state) => state.bloquearFecha)
+
+  useEffect(() => { fetchReservas() }, [])
 
   const selectedReservas = selectedDate ? getReservasByDate(selectedDate) : []
   const selectedReserva = selectedReservas[0] || null

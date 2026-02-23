@@ -1,46 +1,151 @@
 import { create } from 'zustand'
-import { mockPlanes } from '@/data/mockData'
+import { api } from '@/lib/api'
+
+// Mapea plan del backend al formato del frontend
+const mapPlan = (p) => ({
+  id: p.id,
+  titulo: p.titulo,
+  descripcion: p.descripcion || '',
+  categoria: p.categoria?.nombre || '',
+  categoriaId: p.categoriaId,
+  valor: Number(p.precio),
+  ubicacion: p.ubicacion || '',
+  duracion: p.duracion || '',
+  imagenes: p.imagenes || [],
+  imagen: (p.imagenes || [])[0] || '',
+  incluye: p.incluye || [],
+  amenidades: p.amenidades || [],
+  datoClave: p.datoClave || '',
+  notasAccesibilidad: p.notasAccesibilidad || '',
+  politicasCancelacion: p.politicasCancelacion || '',
+  disponibilidad: p.disponibilidad || null,
+  precioOriginal: p.precioOriginal ? Number(p.precioOriginal) : null,
+  isPrincipal: p.destacado,
+  isOferta: p.esOferta,
+  activo: p.activo,
+  createdAt: p.createdAt,
+})
+
+const COLORS = ['teal', 'green', 'blue', 'amber', 'purple', 'pink']
 
 export const usePlanesStore = create((set, get) => ({
-  planes: mockPlanes,
+  planes: [],
+  loading: false,
 
-  addPlan: (plan) => {
-    const newPlan = {
-      ...plan,
-      id: Date.now(),
-      createdAt: new Date().toISOString()
+  fetchPlanes: async () => {
+    set({ loading: true })
+    try {
+      const data = await api.get('/planes/mis/planes')
+      set({ planes: data.map(mapPlan), loading: false })
+    } catch (err) {
+      console.error('Error al cargar planes:', err)
+      set({ loading: false })
     }
+  },
+
+  addPlan: async (plan) => {
+    const data = await api.post('/planes', {
+      categoriaId: plan.categoriaId,
+      titulo: plan.titulo,
+      descripcion: plan.descripcion,
+      ubicacion: plan.ubicacion,
+      precio: plan.valor,
+      imagenes: plan.imagenes || [],
+      incluye: plan.incluye || [],
+      amenidades: plan.amenidades || [],
+      datoClave: plan.datoClave,
+      notasAccesibilidad: plan.notasAccesibilidad,
+      politicasCancelacion: plan.politicasCancelacion,
+      disponibilidad: plan.disponibilidad || null,
+      destacado: false,
+      esOferta: false,
+    })
+    const nuevo = mapPlan(data.plan)
+    set((state) => ({ planes: [...state.planes, nuevo] }))
+    return nuevo
+  },
+
+  updatePlan: async (id, planData) => {
+    const data = await api.put(`/planes/${id}`, {
+      categoriaId: parseInt(planData.categoriaId),
+      titulo: planData.titulo,
+      descripcion: planData.descripcion,
+      ubicacion: planData.ubicacion,
+      duracion: planData.duracion,
+      precio: planData.valor,
+      imagenes: planData.imagenes || [],
+      incluye: planData.incluye || [],
+      amenidades: planData.amenidades || [],
+      datoClave: planData.datoClave,
+      notasAccesibilidad: planData.notasAccesibilidad,
+      politicasCancelacion: planData.politicasCancelacion,
+      disponibilidad: planData.disponibilidad || null,
+    })
+    const updated = mapPlan(data.plan)
     set((state) => ({
-      planes: [...state.planes, newPlan]
+      planes: state.planes.map(p => p.id === id ? updated : p)
+    }))
+    return updated
+  },
+
+  toggleActivo: async (id) => {
+    const plan = get().planes.find(p => p.id === id)
+    if (!plan) return
+    await api.put(`/planes/${id}`, { activo: !plan.activo })
+    set((state) => ({
+      planes: state.planes.map(p => p.id === id ? { ...p, activo: !p.activo } : p)
     }))
   },
 
-  setPlanPrincipal: (id) => {
+  deletePlan: async (id) => {
+    await api.delete(`/planes/${id}`)
+    set((state) => ({ planes: state.planes.filter(p => p.id !== id) }))
+  },
+
+  setPlanPrincipal: async (id) => {
+    await api.put(`/planes/${id}`, { destacado: true })
     set((state) => ({
-      planes: state.planes.map((plan) => ({
-        ...plan,
-        isPrincipal: plan.id === id
-      }))
+      planes: state.planes.map((p) => ({ ...p, isPrincipal: p.id === id }))
     }))
   },
 
-  setPlanOferta: (id) => {
-    set((state) => ({
-      planes: state.planes.map((plan) => ({
-        ...plan,
-        isOferta: plan.id === id
+  setPlanOferta: async (id, precioOferta) => {
+    const plan = get().planes.find(p => p.id === id)
+    if (!plan) return
+    if (!plan.isOferta && precioOferta) {
+      // Activar oferta: nuevo precio es el de oferta, guardar original
+      await api.put(`/planes/${id}`, {
+        esOferta: true,
+        precio: precioOferta,
+        precioOriginal: plan.valor,
+      })
+      set((state) => ({
+        planes: state.planes.map(p =>
+          p.id === id ? { ...p, isOferta: true, valor: precioOferta, precioOriginal: p.valor } : p
+        )
       }))
-    }))
+    } else if (plan.isOferta) {
+      // Desactivar oferta: restaurar precio original
+      const precioRestaurado = plan.precioOriginal || plan.valor
+      await api.put(`/planes/${id}`, {
+        esOferta: false,
+        precio: precioRestaurado,
+        precioOriginal: null,
+      })
+      set((state) => ({
+        planes: state.planes.map(p =>
+          p.id === id ? { ...p, isOferta: false, valor: precioRestaurado, precioOriginal: null } : p
+        )
+      }))
+    }
   },
 
   getPlanesByCategoria: () => {
     const planes = get().planes
     return planes.reduce((acc, plan) => {
-      const categoria = plan.categoria
-      if (!acc[categoria]) {
-        acc[categoria] = []
-      }
-      acc[categoria].push(plan)
+      const cat = plan.categoria || 'Sin categoría'
+      if (!acc[cat]) acc[cat] = []
+      acc[cat].push(plan)
       return acc
     }, {})
   }

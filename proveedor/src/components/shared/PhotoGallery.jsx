@@ -1,6 +1,9 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Plus, X, Star } from 'lucide-react'
+import { Plus, X, Star, AlertTriangle } from 'lucide-react'
+
+const MAX_SIZE_MB = 2
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024
 
 export function PhotoGallery({
   photos = [],
@@ -10,14 +13,24 @@ export function PhotoGallery({
   maxPhotos = 10
 }) {
   const inputRef = useRef(null)
+  const [sizeErrors, setSizeErrors] = useState([])
 
   const handleClick = () => {
+    setSizeErrors([])
     inputRef.current?.click()
   }
 
   const handleChange = (e) => {
     const files = Array.from(e.target.files || [])
+    const errors = []
+
     files.forEach(file => {
+      if (file.size > MAX_SIZE_BYTES) {
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
+        errors.push(`"${file.name}" pesa ${sizeMB} MB — máximo permitido: ${MAX_SIZE_MB} MB`)
+        return
+      }
+
       const reader = new FileReader()
       reader.onloadend = () => {
         onAdd({
@@ -28,6 +41,9 @@ export function PhotoGallery({
       }
       reader.readAsDataURL(file)
     })
+
+    setSizeErrors(errors)
+
     if (inputRef.current) {
       inputRef.current.value = ''
     }
@@ -43,6 +59,21 @@ export function PhotoGallery({
         onChange={handleChange}
         className="hidden"
       />
+
+      {sizeErrors.length > 0 && (
+        <div className="flex flex-col gap-1 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center gap-2 text-yellow-700 text-sm font-medium">
+            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+            {sizeErrors.length === 1 ? 'Imagen demasiado pesada' : 'Algunas imágenes son demasiado pesadas'}
+          </div>
+          {sizeErrors.map((err, i) => (
+            <p key={i} className="text-xs text-yellow-600 ml-6">{err}</p>
+          ))}
+          <p className="text-xs text-yellow-600 ml-6 mt-1">
+            Recomendamos imágenes de menos de 500 KB para una carga óptima en la web.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
         {photos.map((photo, index) => (
@@ -101,7 +132,7 @@ export function PhotoGallery({
 
       {photos.length > 0 && (
         <p className="text-xs text-slate">
-          Click en la estrella para seleccionar como foto principal
+          Click en la estrella para seleccionar como foto principal · Máx. {MAX_SIZE_MB} MB por imagen
         </p>
       )}
     </div>

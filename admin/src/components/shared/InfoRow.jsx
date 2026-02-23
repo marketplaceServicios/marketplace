@@ -18,7 +18,7 @@ export function InfoRow({
         </div>
         <span className="text-sm font-medium text-primary sm:min-w-[200px]">{label}</span>
       </div>
-      <span className="text-sm text-muted ml-13 sm:ml-0">{value || 'Descripcion'}</span>
+      <span className="text-sm text-muted ml-13 sm:ml-0">{value != null && value !== '' ? value : '—'}</span>
     </div>
   )
 }

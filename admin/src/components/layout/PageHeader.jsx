@@ -17,10 +17,14 @@ export function PageHeader({
           <p className="text-muted mt-1 text-sm sm:text-base">{subtitle}</p>
         )}
       </div>
-      {action && actionLabel && (
-        <Button variant={actionVariant} onClick={action} className="w-full sm:w-auto">
-          {actionLabel}
-        </Button>
+      {action && (
+        typeof action === 'function' && actionLabel ? (
+          <Button variant={actionVariant} onClick={action} className="w-full sm:w-auto">
+            {actionLabel}
+          </Button>
+        ) : typeof action !== 'function' ? (
+          action
+        ) : null
       )}
     </div>
   )

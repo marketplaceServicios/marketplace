@@ -1,0 +1,204 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== USUARIOS ====================
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  nombre    String
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  proveedores Proveedor[]
+
+  @@map("admins")
+}
+
+model Proveedor {
+  id            Int      @id @default(autoincrement())
+  adminId       Int
+  nombreEmpresa String
+  nombreLegal   String?
+  nit           String?
+  email         String   @unique
+  password      String
+  telefono      String?
+  telefonoFijo  String?
+  celular       String?
+  direccion     String?
+  tipoServicio  String?
+  logo          String?
+  descripcion   String?  @db.Text
+  representante Json?
+  activo              Boolean  @default(true)
+  mustChangePassword  Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  admin        Admin        @relation(fields: [adminId], references: [id])
+  categorias   Categoria[]
+  planes       Plan[]
+  equipo       Equipo[]
+
+  @@map("proveedores")
+}
+
+model Usuario {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  email           String   @unique
+  password        String
+  telefono        String?
+  fechaNacimiento DateTime?
+  tipoDocumento   String?
+  numeroDocumento String?
+  activo          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  reservas     Reserva[]
+  cotizaciones Cotizacion[]
+
+  @@map("usuarios")
+}
+
+// ==================== CATÁLOGO ====================
+
+model Categoria {
+  id          Int      @id @default(autoincrement())
+  proveedorId Int?     // null = categoría global gestionada por el admin
+  nombre      String
+  descripcion String?  @db.Text
+  imagen      String?
+  icono       String?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  proveedor Proveedor? @relation(fields: [proveedorId], references: [id])
+  planes    Plan[]
+
+  @@map("categorias")
+}
+
+model Plan {
+  id             Int      @id @default(autoincrement())
+  proveedorId    Int
+  categoriaId    Int
+  titulo         String
+  descripcion    String?  @db.Text
+  ubicacion      String?
+  precio         Decimal  @db.Decimal(10, 2)
+  precioOriginal Decimal? @db.Decimal(10, 2)
+  duracion       String?
+  fechaInicio    DateTime?
+  fechaFin       DateTime?
+  imagenes              Json?    // Array de URLs de imágenes
+  incluye               Json?    // Array de {title, description}
+  amenidades            Json?    // Array de strings
+  datoClave             String?
+  notasAccesibilidad    String?  @db.Text
+  politicasCancelacion  String?  @db.Text
+  disponibilidad        Json?    // { tipo, diasSemana?, precioFinDeSemana?, fechasEspeciales? }
+  destacado             Boolean  @default(false)
+  esOferta              Boolean  @default(false)
+  activo         Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  proveedor    Proveedor    @relation(fields: [proveedorId], references: [id])
+  categoria    Categoria    @relation(fields: [categoriaId], references: [id])
+  reservas     Reserva[]
+  cotizaciones Cotizacion[]
+
+  @@map("planes")
+}
+
+// ==================== TRANSACCIONES ====================
+
+model Reserva {
+  id               Int      @id @default(autoincrement())
+  codigo           String   @unique
+  planId           Int
+  usuarioId        Int
+  numPersonas      Int
+  turistas         Json?    // Array de objetos con datos de turistas
+  datosFacturacion Json?    // Objeto con datos de facturación
+  metodoPago       String?
+  subtotal         Decimal  @db.Decimal(10, 2)
+  impuestos        Decimal  @db.Decimal(10, 2)
+  total            Decimal  @db.Decimal(10, 2)
+  estado           String   @default("pendiente") // pendiente, confirmada, cancelada, completada
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  plan    Plan    @relation(fields: [planId], references: [id])
+  usuario Usuario @relation(fields: [usuarioId], references: [id])
+
+  @@map("reservas")
+}
+
+model Cotizacion {
+  id           Int      @id @default(autoincrement())
+  planId       Int
+  usuarioId    Int?
+  nombre       String
+  email        String
+  telefono     String?
+  mensaje      String?  @db.Text
+  fechaDeseada DateTime?
+  numPersonas  Int?
+  estado          String    @default("pendiente") // pendiente, respondida, cerrada
+  respuesta       String?   @db.Text
+  fechaRespuesta  DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt    DateTime @updatedAt
+
+  plan    Plan     @relation(fields: [planId], references: [id])
+  usuario Usuario? @relation(fields: [usuarioId], references: [id])
+
+  @@map("cotizaciones")
+}
+
+// ==================== CONTACTO ====================
+
+model Contacto {
+  id                  Int      @id @default(autoincrement())
+  nombre              String
+  email               String
+  celular             String
+  mensaje             String   @db.Text
+  preferenciaContacto String   @default("whatsapp")
+  leido               Boolean  @default(false)
+  createdAt           DateTime @default(now())
+
+  @@map("contactos")
+}
+
+// ==================== EQUIPO ====================
+
+model Equipo {
+  id          Int      @id @default(autoincrement())
+  proveedorId Int
+  nombre      String
+  cargo       String?
+  email       String?
+  telefono    String?
+  foto        String?
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  proveedor Proveedor @relation(fields: [proveedorId], references: [id])
+
+  @@map("equipo")
+}

@@ -11,7 +11,10 @@ import {
   Menu,
   X,
   FileText,
-  BookOpen
+  BookOpen,
+  Tag,
+  MessageSquare,
+  Inbox
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/lib/utils'
@@ -22,8 +25,10 @@ const menuItems = [
   { path: '/empresas-por-servicios', icon: Building2, label: 'Proveedores' },
   { path: '/usuarios-registrados', icon: Users, label: 'Usuarios registrados' },
   { path: '/crear-empresa', icon: Plus, label: 'Crear empresa' },
-  { path: '/crear-tipo-servicio', icon: PlusCircle, label: 'Crear tipo de servicio' },
+  { path: '/categorias', icon: Tag, label: 'Categorías' },
   { path: '/planes-admin', icon: FileText, label: 'Planes' },
+  { path: '/cotizaciones', icon: MessageSquare, label: 'Cotizaciones' },
+  { path: '/mensajes', icon: Inbox, label: 'Mensajes' },
   { path: '/contenido', icon: BookOpen, label: 'Contenido' },
   { path: '/perfil', icon: User, label: 'Mi perfil' },
 ]
