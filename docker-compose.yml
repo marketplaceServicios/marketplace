@@ -18,6 +18,7 @@ services:
 
   api:
     image: ghcr.io/marketplaceservicios/vive-silver-api:latest
+    pull_policy: always
     container_name: vive-silver-api
     restart: always
     environment:
@@ -40,6 +41,7 @@ services:
 
   admin:
     image: ghcr.io/marketplaceservicios/vive-silver-admin:latest
+    pull_policy: always
     container_name: vive-silver-admin
     restart: always
     networks:
@@ -47,6 +49,7 @@ services:
 
   proveedor:
     image: ghcr.io/marketplaceservicios/vive-silver-proveedor:latest
+    pull_policy: always
     container_name: vive-silver-proveedor
     restart: always
     networks:
