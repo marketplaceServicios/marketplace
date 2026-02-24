@@ -1,6 +1,7 @@
 name: Deploy to Hostinger
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
@@ -8,6 +9,7 @@ on:
       - 'proveedor/**'
       - 'backend/**'
       - 'docker-compose.yml'
+      - '.github/workflows/deploy.yml'
 
 env:
   REGISTRY: ghcr.io
