@@ -17,9 +17,7 @@ services:
       - backend
 
   api:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ghcr.io/marketplaceservicios/vive-silver-api:latest
     container_name: vive-silver-api
     restart: always
     environment:
@@ -41,18 +39,14 @@ services:
       - backend
 
   admin:
-    build:
-      context: ./admin
-      dockerfile: Dockerfile
+    image: ghcr.io/marketplaceservicios/vive-silver-admin:latest
     container_name: vive-silver-admin
     restart: always
     networks:
       - proxy
 
   proveedor:
-    build:
-      context: ./proveedor
-      dockerfile: Dockerfile
+    image: ghcr.io/marketplaceservicios/vive-silver-proveedor:latest
     container_name: vive-silver-proveedor
     restart: always
     networks:
