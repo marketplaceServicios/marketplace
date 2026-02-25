@@ -227,6 +227,7 @@ model EnlaceRapido {
   id                 Int      @id @default(autoincrement())
   titulo             String
   url                String
+  tipo               String   @default("rapido") // rapido | legal
   abrirNuevaPestana  Boolean  @default(false)
   activo             Boolean  @default(true)
   orden              Int      @default(0)
