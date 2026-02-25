@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button'
 import { FileUpload } from '@/components/shared/FileUpload'
 import { useTestimoniosStore } from '@/store/testimoniosStore'
 import { useExperiencias360Store } from '@/store/experiencias360Store'
+import { useEnlacesRapidosStore } from '@/store/enlacesRapidosStore'
 import { api } from '@/lib/api'
-import { FileText, Image, Video, Plus, Edit, Trash2, Star, X, Check, Eye, EyeOff, Save, Loader2, Globe } from 'lucide-react'
+import { FileText, Image, Video, Plus, Edit, Trash2, Star, X, Check, Eye, EyeOff, Save, Loader2, Globe, Link2 } from 'lucide-react'
 
 const mockGuias = [
   { id: 1, titulo: 'Guía de accesibilidad para viajeros Silver', tipo: 'PDF', fecha: '2024-01-10' },
@@ -14,10 +15,11 @@ const mockGuias = [
   { id: 3, titulo: 'Recomendaciones para familias cuidadoras', tipo: 'PDF', fecha: '2024-01-05' },
 ]
 
-const tabs = ['Testimonios', 'Experiencias 360', 'Guías', 'Recursos']
+const tabs = ['Testimonios', 'Experiencias 360', 'Enlaces rápidos', 'Guías', 'Recursos']
 
 const emptyForm = { nombre: '', ciudad: '', texto: '', rating: 5, foto: '' }
 const emptyExp360Form = { titulo: '', descripcion: '', iframeSrc: '', thumbnail: '', orden: 0 }
+const emptyEnlaceForm = { titulo: '', url: '', orden: 0 }
 
 export function ContenidoPage() {
   const [activeTab, setActiveTab] = useState('Testimonios')
@@ -39,11 +41,19 @@ export function ContenidoPage() {
 
   const { testimonios, loading, fetchTestimonios, createTestimonio, updateTestimonio, deleteTestimonio } = useTestimoniosStore()
   const { experiencias, loading: loadingExp360, fetchExperiencias, createExperiencia, updateExperiencia, deleteExperiencia } = useExperiencias360Store()
+  const { enlaces, loading: loadingEnlaces, fetchEnlaces, createEnlace, updateEnlace, deleteEnlace } = useEnlacesRapidosStore()
+
+  // Enlaces rápidos state
+  const [showEnlaceForm, setShowEnlaceForm] = useState(false)
+  const [enlaceForm, setEnlaceForm] = useState(emptyEnlaceForm)
+  const [editingEnlaceId, setEditingEnlaceId] = useState(null)
+  const [editEnlaceForm, setEditEnlaceForm] = useState(emptyEnlaceForm)
 
   useEffect(() => {
     fetchTestimonios()
     fetchExperiencias()
-  }, [fetchTestimonios, fetchExperiencias])
+    fetchEnlaces()
+  }, [fetchTestimonios, fetchExperiencias, fetchEnlaces])
 
   const uploadFoto = async (file) => {
     if (!file) return null
@@ -532,6 +542,173 @@ export function ContenidoPage() {
                         </span>
                       </div>
                     </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'Enlaces rápidos' && (
+        <div>
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => { setShowEnlaceForm(!showEnlaceForm); setEnlaceForm(emptyEnlaceForm) }} size="sm">
+              {showEnlaceForm ? <X size={16} /> : <Plus size={16} />}
+              <span className="ml-2">{showEnlaceForm ? 'Cancelar' : 'Agregar enlace'}</span>
+            </Button>
+          </div>
+
+          {showEnlaceForm && (
+            <form onSubmit={async (e) => {
+              e.preventDefault()
+              if (!enlaceForm.titulo.trim() || !enlaceForm.url.trim()) return
+              setSaving(true)
+              try {
+                await createEnlace(enlaceForm)
+                setEnlaceForm(emptyEnlaceForm)
+                setShowEnlaceForm(false)
+              } catch (err) {
+                console.error('Error al crear enlace:', err)
+              } finally {
+                setSaving(false)
+              }
+            }} className="bg-white rounded-xl border border-cream shadow-sm p-4 sm:p-6 mb-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-primary mb-1 block">Título *</label>
+                  <Input
+                    value={enlaceForm.titulo}
+                    onChange={(e) => setEnlaceForm({ ...enlaceForm, titulo: e.target.value })}
+                    placeholder="Ej: Inicio"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-primary mb-1 block">URL *</label>
+                  <Input
+                    value={enlaceForm.url}
+                    onChange={(e) => setEnlaceForm({ ...enlaceForm, url: e.target.value })}
+                    placeholder="Ej: /planes o https://..."
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-primary mb-1 block">Orden</label>
+                  <Input
+                    type="number"
+                    value={enlaceForm.orden}
+                    onChange={(e) => setEnlaceForm({ ...enlaceForm, orden: parseInt(e.target.value) || 0 })}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" disabled={saving}>
+                  {saving && <Loader2 size={16} className="animate-spin mr-2" />}
+                  <Save size={16} className="mr-2" />
+                  Guardar
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {loadingEnlaces ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={24} className="animate-spin text-accent" />
+            </div>
+          ) : enlaces.length === 0 ? (
+            <div className="text-center py-12 text-muted">
+              No hay enlaces rápidos. Crea el primero.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {enlaces.map(enlace => (
+                <div key={enlace.id} className="bg-white rounded-xl border border-cream shadow-sm p-4 sm:p-5">
+                  {editingEnlaceId === enlace.id ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-primary mb-1 block">Título *</label>
+                          <Input
+                            value={editEnlaceForm.titulo}
+                            onChange={(e) => setEditEnlaceForm({ ...editEnlaceForm, titulo: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-primary mb-1 block">URL *</label>
+                          <Input
+                            value={editEnlaceForm.url}
+                            onChange={(e) => setEditEnlaceForm({ ...editEnlaceForm, url: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-primary mb-1 block">Orden</label>
+                          <Input
+                            type="number"
+                            value={editEnlaceForm.orden}
+                            onChange={(e) => setEditEnlaceForm({ ...editEnlaceForm, orden: parseInt(e.target.value) || 0 })}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => setEditingEnlaceId(null)}>
+                          <X size={16} className="mr-1" /> Cancelar
+                        </Button>
+                        <Button size="sm" disabled={saving} onClick={async () => {
+                          if (!editEnlaceForm.titulo.trim() || !editEnlaceForm.url.trim()) return
+                          setSaving(true)
+                          try {
+                            await updateEnlace(enlace.id, editEnlaceForm)
+                            setEditingEnlaceId(null)
+                          } catch (err) {
+                            console.error('Error al actualizar enlace:', err)
+                          } finally {
+                            setSaving(false)
+                          }
+                        }}>
+                          {saving && <Loader2 size={16} className="animate-spin mr-1" />}
+                          <Check size={16} className="mr-1" /> Guardar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Link2 size={16} className="text-accent shrink-0" />
+                        <div className="min-w-0">
+                          <p className="font-medium text-primary">{enlace.titulo}</p>
+                          <p className="text-sm text-muted truncate">{enlace.url}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4 shrink-0">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${enlace.activo ? 'bg-sage/20 text-sage' : 'bg-cream text-muted'}`}>
+                          {enlace.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-cream text-muted">
+                          #{enlace.orden}
+                        </span>
+                        <button onClick={async () => {
+                          try { await updateEnlace(enlace.id, { activo: !enlace.activo }) } catch (err) { console.error(err) }
+                        }} className="p-1.5 rounded-lg hover:bg-cream text-muted" title={enlace.activo ? 'Desactivar' : 'Activar'}>
+                          {enlace.activo ? <Eye size={16} /> : <EyeOff size={16} />}
+                        </button>
+                        <button onClick={() => {
+                          setEditingEnlaceId(enlace.id)
+                          setEditEnlaceForm({ titulo: enlace.titulo, url: enlace.url, orden: enlace.orden || 0 })
+                        }} className="p-1.5 rounded-lg hover:bg-cream text-muted">
+                          <Edit size={16} />
+                        </button>
+                        <button onClick={async () => {
+                          if (!confirm('¿Eliminar este enlace?')) return
+                          try { await deleteEnlace(enlace.id) } catch (err) { console.error(err) }
+                        }} className="p-1.5 rounded-lg hover:bg-danger/10 text-danger">
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
               ))}

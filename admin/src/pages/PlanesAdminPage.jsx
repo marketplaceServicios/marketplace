@@ -183,7 +183,7 @@ export function PlanesAdminPage() {
                         <button
                           className="p-1.5 rounded-lg hover:bg-cream text-muted"
                           title="Ver en la web"
-                          onClick={() => window.open(`http://localhost:5175/planes/${plan.id}`, '_blank')}
+                          onClick={() => window.open(`https://proveedor.vivesilver.com/planes/${plan.id}`, '_blank')}
                         >
                           <Eye size={16} />
                         </button>
