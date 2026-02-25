@@ -19,7 +19,7 @@ const tabs = ['Testimonios', 'Experiencias 360', 'Enlaces rápidos', 'Guías', '
 
 const emptyForm = { nombre: '', ciudad: '', texto: '', rating: 5, foto: '' }
 const emptyExp360Form = { titulo: '', descripcion: '', iframeSrc: '', thumbnail: '', orden: 0 }
-const emptyEnlaceForm = { titulo: '', url: '', orden: 0 }
+const emptyEnlaceForm = { titulo: '', url: '', abrirNuevaPestana: false, orden: 0 }
 
 export function ContenidoPage() {
   const [activeTab, setActiveTab] = useState('Testimonios')
@@ -603,6 +603,15 @@ export function ContenidoPage() {
                   />
                 </div>
               </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={enlaceForm.abrirNuevaPestana}
+                  onChange={(e) => setEnlaceForm({ ...enlaceForm, abrirNuevaPestana: e.target.checked })}
+                  className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent"
+                />
+                <span className="text-sm text-primary">Abrir en nueva pestaña</span>
+              </label>
               <div className="flex justify-end">
                 <Button type="submit" disabled={saving}>
                   {saving && <Loader2 size={16} className="animate-spin mr-2" />}
@@ -653,6 +662,15 @@ export function ContenidoPage() {
                           />
                         </div>
                       </div>
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={editEnlaceForm.abrirNuevaPestana}
+                          onChange={(e) => setEditEnlaceForm({ ...editEnlaceForm, abrirNuevaPestana: e.target.checked })}
+                          className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent"
+                        />
+                        <span className="text-sm text-primary">Abrir en nueva pestaña</span>
+                      </label>
                       <div className="flex justify-end gap-2">
                         <Button variant="ghost" size="sm" onClick={() => setEditingEnlaceId(null)}>
                           <X size={16} className="mr-1" /> Cancelar
@@ -697,7 +715,7 @@ export function ContenidoPage() {
                         </button>
                         <button onClick={() => {
                           setEditingEnlaceId(enlace.id)
-                          setEditEnlaceForm({ titulo: enlace.titulo, url: enlace.url, orden: enlace.orden || 0 })
+                          setEditEnlaceForm({ titulo: enlace.titulo, url: enlace.url, abrirNuevaPestana: enlace.abrirNuevaPestana || false, orden: enlace.orden || 0 })
                         }} className="p-1.5 rounded-lg hover:bg-cream text-muted">
                           <Edit size={16} />
                         </button>

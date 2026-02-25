@@ -224,13 +224,14 @@ model Testimonio {
 // ==================== ENLACES RÁPIDOS ====================
 
 model EnlaceRapido {
-  id        Int      @id @default(autoincrement())
-  titulo    String
-  url       String
-  activo    Boolean  @default(true)
-  orden     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                 Int      @id @default(autoincrement())
+  titulo             String
+  url                String
+  abrirNuevaPestana  Boolean  @default(false)
+  activo             Boolean  @default(true)
+  orden              Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   @@map("enlaces_rapidos")
 }

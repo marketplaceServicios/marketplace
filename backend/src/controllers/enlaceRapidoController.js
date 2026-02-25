@@ -27,7 +27,7 @@ const getAllAdmin = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { titulo, url, activo, orden } = req.body
+    const { titulo, url, abrirNuevaPestana, activo, orden } = req.body
     if (!titulo || !url) {
       return res.status(400).json({ error: 'Título y URL son requeridos' })
     }
@@ -35,6 +35,7 @@ const create = async (req, res) => {
       data: {
         titulo,
         url,
+        abrirNuevaPestana: abrirNuevaPestana || false,
         activo: activo !== undefined ? activo : true,
         orden: parseInt(orden) || 0
       }
@@ -49,7 +50,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params
-    const { titulo, url, activo, orden } = req.body
+    const { titulo, url, abrirNuevaPestana, activo, orden } = req.body
 
     const existing = await prisma.enlaceRapido.findUnique({ where: { id: parseInt(id) } })
     if (!existing) {
@@ -59,6 +60,7 @@ const update = async (req, res) => {
     const data = {}
     if (titulo !== undefined) data.titulo = titulo
     if (url !== undefined) data.url = url
+    if (abrirNuevaPestana !== undefined) data.abrirNuevaPestana = abrirNuevaPestana
     if (activo !== undefined) data.activo = activo
     if (orden !== undefined) data.orden = parseInt(orden)
 
