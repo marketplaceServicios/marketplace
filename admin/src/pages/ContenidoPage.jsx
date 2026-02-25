@@ -4,8 +4,9 @@ import { Input, Textarea } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { FileUpload } from '@/components/shared/FileUpload'
 import { useTestimoniosStore } from '@/store/testimoniosStore'
+import { useExperiencias360Store } from '@/store/experiencias360Store'
 import { api } from '@/lib/api'
-import { FileText, Image, Video, Plus, Edit, Trash2, Star, X, Check, Eye, EyeOff, Save, Loader2 } from 'lucide-react'
+import { FileText, Image, Video, Plus, Edit, Trash2, Star, X, Check, Eye, EyeOff, Save, Loader2, Globe } from 'lucide-react'
 
 const mockGuias = [
   { id: 1, titulo: 'Guía de accesibilidad para viajeros Silver', tipo: 'PDF', fecha: '2024-01-10' },
@@ -13,9 +14,10 @@ const mockGuias = [
   { id: 3, titulo: 'Recomendaciones para familias cuidadoras', tipo: 'PDF', fecha: '2024-01-05' },
 ]
 
-const tabs = ['Testimonios', 'Guías', 'Recursos']
+const tabs = ['Testimonios', 'Experiencias 360', 'Guías', 'Recursos']
 
 const emptyForm = { nombre: '', ciudad: '', texto: '', rating: 5, foto: '' }
+const emptyExp360Form = { titulo: '', descripcion: '', iframeSrc: '', thumbnail: '', orden: 0 }
 
 export function ContenidoPage() {
   const [activeTab, setActiveTab] = useState('Testimonios')
@@ -27,11 +29,21 @@ export function ContenidoPage() {
   const [fotoFile, setFotoFile] = useState(null)
   const [editFotoFile, setEditFotoFile] = useState(null)
 
+  // Experiencias 360 state
+  const [showExp360Form, setShowExp360Form] = useState(false)
+  const [exp360Form, setExp360Form] = useState(emptyExp360Form)
+  const [editingExp360Id, setEditingExp360Id] = useState(null)
+  const [editExp360Form, setEditExp360Form] = useState(emptyExp360Form)
+  const [exp360ThumbFile, setExp360ThumbFile] = useState(null)
+  const [editExp360ThumbFile, setEditExp360ThumbFile] = useState(null)
+
   const { testimonios, loading, fetchTestimonios, createTestimonio, updateTestimonio, deleteTestimonio } = useTestimoniosStore()
+  const { experiencias, loading: loadingExp360, fetchExperiencias, createExperiencia, updateExperiencia, deleteExperiencia } = useExperiencias360Store()
 
   useEffect(() => {
     fetchTestimonios()
-  }, [fetchTestimonios])
+    fetchExperiencias()
+  }, [fetchTestimonios, fetchExperiencias])
 
   const uploadFoto = async (file) => {
     if (!file) return null
@@ -289,6 +301,234 @@ export function ContenidoPage() {
                       <div className="mt-3">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${t.activo ? 'bg-sage/20 text-sage' : 'bg-cream text-muted'}`}>
                           {t.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'Experiencias 360' && (
+        <div>
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => { setShowExp360Form(!showExp360Form); setExp360Form(emptyExp360Form); setExp360ThumbFile(null) }} size="sm">
+              {showExp360Form ? <X size={16} /> : <Plus size={16} />}
+              <span className="ml-2">{showExp360Form ? 'Cancelar' : 'Agregar experiencia 360'}</span>
+            </Button>
+          </div>
+
+          {showExp360Form && (
+            <form onSubmit={async (e) => {
+              e.preventDefault()
+              if (!exp360Form.titulo.trim() || !exp360Form.iframeSrc.trim()) return
+              setSaving(true)
+              try {
+                let thumbnail = exp360Form.thumbnail
+                if (exp360ThumbFile) thumbnail = await uploadFoto(exp360ThumbFile)
+                await createExperiencia({ ...exp360Form, thumbnail })
+                setExp360Form(emptyExp360Form)
+                setExp360ThumbFile(null)
+                setShowExp360Form(false)
+              } catch (err) {
+                console.error('Error al crear experiencia 360:', err)
+              } finally {
+                setSaving(false)
+              }
+            }} className="bg-white rounded-xl border border-cream shadow-sm p-4 sm:p-6 mb-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-primary mb-1 block">Título *</label>
+                  <Input
+                    value={exp360Form.titulo}
+                    onChange={(e) => setExp360Form({ ...exp360Form, titulo: e.target.value })}
+                    placeholder="Ej: La Hermita"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-primary mb-1 block">Orden</label>
+                  <Input
+                    type="number"
+                    value={exp360Form.orden}
+                    onChange={(e) => setExp360Form({ ...exp360Form, orden: parseInt(e.target.value) || 0 })}
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-primary mb-1 block">Descripción</label>
+                <Textarea
+                  value={exp360Form.descripcion}
+                  onChange={(e) => setExp360Form({ ...exp360Form, descripcion: e.target.value })}
+                  placeholder="Descripción de la experiencia..."
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-primary mb-1 block">URL del iframe (Kuula) *</label>
+                <Input
+                  value={exp360Form.iframeSrc}
+                  onChange={(e) => setExp360Form({ ...exp360Form, iframeSrc: e.target.value })}
+                  placeholder="https://kuula.co/share/collection/..."
+                  required
+                />
+              </div>
+              <div className="flex items-center gap-6">
+                <FileUpload
+                  label="Thumbnail"
+                  preview={exp360Form.thumbnail || null}
+                  onChange={(file) => setExp360ThumbFile(file)}
+                />
+                <div className="flex-1">
+                  <label className="text-sm font-medium text-primary mb-1 block">O pegar URL de imagen</label>
+                  <Input
+                    value={exp360Form.thumbnail}
+                    onChange={(e) => setExp360Form({ ...exp360Form, thumbnail: e.target.value })}
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" disabled={saving}>
+                  {saving && <Loader2 size={16} className="animate-spin mr-2" />}
+                  <Save size={16} className="mr-2" />
+                  Guardar
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {loadingExp360 ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={24} className="animate-spin text-accent" />
+            </div>
+          ) : experiencias.length === 0 ? (
+            <div className="text-center py-12 text-muted">
+              No hay experiencias 360. Crea la primera.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {experiencias.map(exp => (
+                <div key={exp.id} className="bg-white rounded-xl border border-cream shadow-sm p-4 sm:p-6">
+                  {editingExp360Id === exp.id ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-primary mb-1 block">Título *</label>
+                          <Input
+                            value={editExp360Form.titulo}
+                            onChange={(e) => setEditExp360Form({ ...editExp360Form, titulo: e.target.value })}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-primary mb-1 block">Orden</label>
+                          <Input
+                            type="number"
+                            value={editExp360Form.orden}
+                            onChange={(e) => setEditExp360Form({ ...editExp360Form, orden: parseInt(e.target.value) || 0 })}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-primary mb-1 block">Descripción</label>
+                        <Textarea
+                          value={editExp360Form.descripcion}
+                          onChange={(e) => setEditExp360Form({ ...editExp360Form, descripcion: e.target.value })}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-primary mb-1 block">URL del iframe (Kuula) *</label>
+                        <Input
+                          value={editExp360Form.iframeSrc}
+                          onChange={(e) => setEditExp360Form({ ...editExp360Form, iframeSrc: e.target.value })}
+                          required
+                        />
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <FileUpload
+                          label="Thumbnail"
+                          preview={editExp360Form.thumbnail || null}
+                          onChange={(file) => setEditExp360ThumbFile(file)}
+                        />
+                        <div className="flex-1">
+                          <label className="text-sm font-medium text-primary mb-1 block">O pegar URL de imagen</label>
+                          <Input
+                            value={editExp360Form.thumbnail}
+                            onChange={(e) => setEditExp360Form({ ...editExp360Form, thumbnail: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => setEditingExp360Id(null)}>
+                          <X size={16} className="mr-1" /> Cancelar
+                        </Button>
+                        <Button size="sm" disabled={saving} onClick={async () => {
+                          if (!editExp360Form.titulo.trim() || !editExp360Form.iframeSrc.trim()) return
+                          setSaving(true)
+                          try {
+                            let thumbnail = editExp360Form.thumbnail
+                            if (editExp360ThumbFile) thumbnail = await uploadFoto(editExp360ThumbFile)
+                            await updateExperiencia(exp.id, { ...editExp360Form, thumbnail })
+                            setEditingExp360Id(null)
+                            setEditExp360ThumbFile(null)
+                          } catch (err) {
+                            console.error('Error al actualizar experiencia 360:', err)
+                          } finally {
+                            setSaving(false)
+                          }
+                        }}>
+                          {saving && <Loader2 size={16} className="animate-spin mr-1" />}
+                          <Check size={16} className="mr-1" /> Guardar
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-start">
+                        <div className="flex gap-4 flex-1">
+                          {exp.thumbnail && (
+                            <img src={exp.thumbnail} alt={exp.titulo} className="w-20 h-14 rounded-lg object-cover shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Globe size={14} className="text-accent shrink-0" />
+                              <p className="font-medium text-primary">{exp.titulo}</p>
+                            </div>
+                            {exp.descripcion && <p className="text-sm text-muted mb-1 line-clamp-1">{exp.descripcion}</p>}
+                            <p className="text-xs text-muted truncate">{exp.iframeSrc}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 ml-4 shrink-0">
+                          <button onClick={async () => {
+                            try { await updateExperiencia(exp.id, { activo: !exp.activo }) } catch (err) { console.error(err) }
+                          }} className="p-1.5 rounded-lg hover:bg-cream text-muted" title={exp.activo ? 'Desactivar' : 'Activar'}>
+                            {exp.activo ? <Eye size={16} /> : <EyeOff size={16} />}
+                          </button>
+                          <button onClick={() => {
+                            setEditingExp360Id(exp.id)
+                            setEditExp360Form({ titulo: exp.titulo, descripcion: exp.descripcion || '', iframeSrc: exp.iframeSrc, thumbnail: exp.thumbnail || '', orden: exp.orden || 0 })
+                            setEditExp360ThumbFile(null)
+                          }} className="p-1.5 rounded-lg hover:bg-cream text-muted">
+                            <Edit size={16} />
+                          </button>
+                          <button onClick={async () => {
+                            if (!confirm('¿Eliminar esta experiencia 360?')) return
+                            try { await deleteExperiencia(exp.id) } catch (err) { console.error(err) }
+                          }} className="p-1.5 rounded-lg hover:bg-danger/10 text-danger">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${exp.activo ? 'bg-sage/20 text-sage' : 'bg-cream text-muted'}`}>
+                          {exp.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-cream text-muted">
+                          Orden: {exp.orden}
                         </span>
                       </div>
                     </>

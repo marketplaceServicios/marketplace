@@ -220,3 +220,19 @@ model Testimonio {
 
   @@map("testimonios")
 }
+
+// ==================== EXPERIENCIAS 360 ====================
+
+model Experiencia360 {
+  id          Int      @id @default(autoincrement())
+  titulo      String
+  descripcion String?  @db.Text
+  iframeSrc   String   @db.Text
+  thumbnail   String?
+  activo      Boolean  @default(true)
+  orden       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("experiencias_360")
+}

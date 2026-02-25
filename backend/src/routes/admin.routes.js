@@ -3,6 +3,7 @@ const router = express.Router()
 const adminController = require('../controllers/adminController')
 const contactoController = require('../controllers/contactoController')
 const testimonioController = require('../controllers/testimonioController')
+const experiencia360Controller = require('../controllers/experiencia360Controller')
 const { verifyToken, isAdmin } = require('../middlewares/auth')
 
 // Todas las rutas requieren ser admin
@@ -29,6 +30,12 @@ router.get('/testimonios', testimonioController.getAllAdmin)
 router.post('/testimonios', testimonioController.create)
 router.put('/testimonios/:id', testimonioController.update)
 router.delete('/testimonios/:id', testimonioController.remove)
+
+// Experiencias 360
+router.get('/experiencias360', experiencia360Controller.getAllAdmin)
+router.post('/experiencias360', experiencia360Controller.create)
+router.put('/experiencias360/:id', experiencia360Controller.update)
+router.delete('/experiencias360/:id', experiencia360Controller.remove)
 
 // Gestión de planes
 router.get('/planes', adminController.getPlanes)
