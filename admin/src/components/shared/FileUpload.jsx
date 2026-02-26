@@ -44,6 +44,7 @@ export function FileUpload({
               className="w-32 sm:w-40 h-24 sm:h-28 object-cover rounded-lg border border-cream"
             />
             <button
+              type="button"
               onClick={handleRemove}
               className="absolute -top-2 -right-2 w-6 h-6 bg-danger text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
             >
@@ -52,6 +53,7 @@ export function FileUpload({
           </div>
         ) : (
           <button
+            type="button"
             onClick={() => inputRef.current?.click()}
             className="flex items-center gap-2 text-sm text-primary hover:text-accent transition-colors"
           >
