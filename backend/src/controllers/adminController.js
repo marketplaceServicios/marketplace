@@ -1,4 +1,5 @@
 const prisma = require('../config/database')
+const slugify = require('../utils/slugify')
 
 // Dashboard del admin - estadísticas generales
 const getDashboard = async (req, res) => {
@@ -87,8 +88,16 @@ const createCategoria = async (req, res) => {
       return res.status(400).json({ error: 'El nombre es requerido' })
     }
 
+    let slug = slugify(nombre)
+    let suffix = 0
+    let candidate = slug
+    while (await prisma.categoria.findUnique({ where: { slug: candidate } })) {
+      suffix++
+      candidate = `${slug}-${suffix}`
+    }
+
     const categoria = await prisma.categoria.create({
-      data: { nombre, descripcion, imagen, icono, proveedorId: null }
+      data: { nombre, descripcion, imagen, icono, slug: candidate, proveedorId: null }
     })
 
     res.status(201).json({ message: 'Categoría creada exitosamente', categoria })
@@ -111,9 +120,25 @@ const updateCategoria = async (req, res) => {
       return res.status(404).json({ error: 'Categoría no encontrada' })
     }
 
+    const data = { nombre, descripcion, imagen, icono, activo }
+
+    // Regenerate slug if nombre changed
+    if (nombre && nombre !== existing.nombre) {
+      let slug = slugify(nombre)
+      let suffix = 0
+      let candidate = slug
+      while (true) {
+        const found = await prisma.categoria.findUnique({ where: { slug: candidate } })
+        if (!found || found.id === parseInt(id)) break
+        suffix++
+        candidate = `${slug}-${suffix}`
+      }
+      data.slug = candidate
+    }
+
     const categoria = await prisma.categoria.update({
       where: { id: parseInt(id) },
-      data: { nombre, descripcion, imagen, icono, activo }
+      data
     })
 
     res.json({ message: 'Categoría actualizada exitosamente', categoria })
@@ -376,3 +401,180 @@ const getIngresos = async (req, res) => {
 }
 
 module.exports = { getDashboard, getUsuarios, getCategorias, createCategoria, updateCategoria, deleteCategoria, getPlanes, togglePlan, toggleDestacado, toggleEsOferta, getCotizaciones, getIngresos, getReservas }
+// ==================== ADMINISTRADORES ====================
+
+// Obtener todos los admins
+const getAdmins = async (req, res) => {
+  try {
+    const admins = await prisma.admin.findMany({
+      select: { id: true, email: true, nombre: true, activo: true, createdAt: true },
+      orderBy: { id: 'desc' }
+    })
+    res.json(admins)
+  } catch (error) {
+    console.error('Error en getAdmins:', error)
+    res.status(500).json({ error: 'Error al obtener administradores' })
+  }
+}
+
+// Crear admin
+const createAdmin = async (req, res) => {
+  try {
+    const { nombre, email, password } = req.body
+    if (!nombre || !email || !password) {
+      return res.status(400).json({ error: 'Nombre, email y contraseña son requeridos' })
+    }
+    const existing = await prisma.admin.findUnique({ where: { email } })
+    if (existing) {
+      return res.status(400).json({ error: 'El email ya está registrado' })
+    }
+    const bcrypt = require('bcryptjs')
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const admin = await prisma.admin.create({
+      data: { nombre, email, password: hashedPassword }
+    })
+    const { password: _, ...adminSinPassword } = admin
+    res.status(201).json({ message: 'Administrador creado exitosamente', admin: adminSinPassword })
+  } catch (error) {
+    console.error('Error en createAdmin:', error)
+    res.status(500).json({ error: 'Error al crear administrador' })
+  }
+}
+
+// Actualizar admin
+const updateAdmin = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { nombre, email, activo } = req.body
+    const existing = await prisma.admin.findUnique({ where: { id: parseInt(id) } })
+    if (!existing) {
+      return res.status(404).json({ error: 'Administrador no encontrado' })
+    }
+    if (activo === false && req.admin.id === parseInt(id)) {
+      return res.status(400).json({ error: 'No puedes desactivarte a ti mismo' })
+    }
+    if (email && email !== existing.email) {
+      const emailTaken = await prisma.admin.findUnique({ where: { email } })
+      if (emailTaken) {
+        return res.status(400).json({ error: 'El email ya está en uso' })
+      }
+    }
+    const admin = await prisma.admin.update({
+      where: { id: parseInt(id) },
+      data: { nombre, email, activo }
+    })
+    const { password: _, ...adminSinPassword } = admin
+    res.json({ message: 'Administrador actualizado', admin: adminSinPassword })
+  } catch (error) {
+    console.error('Error en updateAdmin:', error)
+    res.status(500).json({ error: 'Error al actualizar administrador' })
+  }
+}
+
+// ==================== CLIENTES (USUARIOS) ====================
+
+// Toggle activo cliente
+const toggleUsuario = async (req, res) => {
+  try {
+    const { id } = req.params
+    const usuario = await prisma.usuario.findUnique({ where: { id: parseInt(id) } })
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' })
+    }
+    const updated = await prisma.usuario.update({
+      where: { id: parseInt(id) },
+      data: { activo: !usuario.activo }
+    })
+    res.json({ message: `Usuario ${updated.activo ? 'activado' : 'desactivado'}`, activo: updated.activo })
+  } catch (error) {
+    console.error('Error en toggleUsuario:', error)
+    res.status(500).json({ error: 'Error al actualizar usuario' })
+  }
+}
+
+// ==================== EQUIPO ====================
+
+// Obtener equipo de todas las empresas (Admin)
+const getAllEquipo = async (req, res) => {
+  try {
+    const { proveedorId } = req.query
+    const where = {}
+    if (proveedorId) where.proveedorId = parseInt(proveedorId)
+
+    const equipo = await prisma.equipo.findMany({
+      where,
+      include: {
+        proveedor: { select: { id: true, nombreEmpresa: true } }
+      },
+      orderBy: { id: 'desc' }
+    })
+    res.json(equipo)
+  } catch (error) {
+    console.error('Error en getAllEquipo:', error)
+    res.status(500).json({ error: 'Error al obtener equipo' })
+  }
+}
+
+// Crear miembro de equipo (Admin)
+const createEquipoAdmin = async (req, res) => {
+  try {
+    const { proveedorId, nombre, cargo, email, telefono } = req.body
+    if (!proveedorId || !nombre) {
+      return res.status(400).json({ error: 'Empresa y nombre son requeridos' })
+    }
+    const proveedor = await prisma.proveedor.findUnique({ where: { id: parseInt(proveedorId) } })
+    if (!proveedor) {
+      return res.status(400).json({ error: 'Empresa no encontrada' })
+    }
+    const miembro = await prisma.equipo.create({
+      data: { proveedorId: parseInt(proveedorId), nombre, cargo, email, telefono },
+      include: { proveedor: { select: { id: true, nombreEmpresa: true } } }
+    })
+    res.status(201).json({ message: 'Miembro de equipo creado', miembro })
+  } catch (error) {
+    console.error('Error en createEquipoAdmin:', error)
+    res.status(500).json({ error: 'Error al crear miembro de equipo' })
+  }
+}
+
+// Actualizar miembro de equipo (Admin)
+const updateEquipoAdmin = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { nombre, cargo, email, telefono, proveedorId } = req.body
+    const existing = await prisma.equipo.findUnique({ where: { id: parseInt(id) } })
+    if (!existing) {
+      return res.status(404).json({ error: 'Miembro no encontrado' })
+    }
+    const miembro = await prisma.equipo.update({
+      where: { id: parseInt(id) },
+      data: { nombre, cargo, email, telefono, proveedorId: proveedorId ? parseInt(proveedorId) : undefined },
+      include: { proveedor: { select: { id: true, nombreEmpresa: true } } }
+    })
+    res.json({ message: 'Miembro actualizado', miembro })
+  } catch (error) {
+    console.error('Error en updateEquipoAdmin:', error)
+    res.status(500).json({ error: 'Error al actualizar miembro' })
+  }
+}
+
+// Eliminar miembro de equipo (Admin)
+const deleteEquipoAdmin = async (req, res) => {
+  try {
+    const { id } = req.params
+    const existing = await prisma.equipo.findUnique({ where: { id: parseInt(id) } })
+    if (!existing) {
+      return res.status(404).json({ error: 'Miembro no encontrado' })
+    }
+    await prisma.equipo.update({
+      where: { id: parseInt(id) },
+      data: { activo: false }
+    })
+    res.json({ message: 'Miembro eliminado exitosamente' })
+  } catch (error) {
+    console.error('Error en deleteEquipoAdmin:', error)
+    res.status(500).json({ error: 'Error al eliminar miembro' })
+  }
+}
+
+module.exports = { getDashboard, getUsuarios, getCategorias, createCategoria, updateCategoria, deleteCategoria, getPlanes, togglePlan, toggleDestacado, toggleEsOferta, getCotizaciones, getAdmins, createAdmin, updateAdmin, toggleUsuario, getAllEquipo, createEquipoAdmin, updateEquipoAdmin, deleteEquipoAdmin }

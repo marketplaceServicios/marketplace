@@ -12,8 +12,12 @@ const reservaRoutes = require('./routes/reserva.routes')
 const cotizacionRoutes = require('./routes/cotizacion.routes')
 const contactoRoutes = require('./routes/contacto.routes')
 const equipoRoutes = require('./routes/equipo.routes')
+const testimonioRoutes = require('./routes/testimonio.routes')
+const experiencia360Routes = require('./routes/experiencia360.routes')
+const enlaceRapidoRoutes = require('./routes/enlaceRapido.routes')
 const uploadRoutes = require('./routes/upload.routes')
 const webhookRoutes = require('./routes/webhook.routes')
+const reviewRoutes = require('./routes/review.routes')
 
 const app = express()
 
@@ -56,8 +60,12 @@ app.use('/api/reservas', reservaRoutes)
 app.use('/api/cotizaciones', cotizacionRoutes)
 app.use('/api/contacto', contactoRoutes)
 app.use('/api/equipo', equipoRoutes)
+app.use('/api/testimonios', testimonioRoutes)
+app.use('/api/experiencias360', experiencia360Routes)
+app.use('/api/enlaces-rapidos', enlaceRapidoRoutes)
 app.use('/api/admin/upload', uploadRoutes)
 app.use('/api/webhooks', webhookRoutes)
+app.use('/api/resenas', reviewRoutes)
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

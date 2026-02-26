@@ -1,15 +1,59 @@
 name: Deploy to Hostinger
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
       - 'admin/**'
       - 'proveedor/**'
+      - 'backend/**'
       - 'docker-compose.yml'
+      - '.github/workflows/deploy.yml'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/marketplaceservicios
 
 jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.IMAGE_PREFIX }}/vive-silver-api:latest
+
+      - name: Build and push Admin image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./admin
+          push: true
+          tags: ${{ env.IMAGE_PREFIX }}/vive-silver-admin:latest
+
+      - name: Build and push Proveedor image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./proveedor
+          push: true
+          tags: ${{ env.IMAGE_PREFIX }}/vive-silver-proveedor:latest
+
   deploy:
+    needs: build-and-push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

@@ -39,4 +39,25 @@ const getById = async (req, res) => {
   }
 }
 
-module.exports = { getAll, getById }
+// Obtener una categoría por slug (público)
+const getBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params
+
+    const categoria = await prisma.categoria.findUnique({
+      where: { slug },
+      include: { _count: { select: { planes: true } } }
+    })
+
+    if (!categoria) {
+      return res.status(404).json({ error: 'Categoría no encontrada' })
+    }
+
+    res.json(categoria)
+  } catch (error) {
+    console.error('Error en getBySlug categoria:', error)
+    res.status(500).json({ error: 'Error al obtener categoría' })
+  }
+}
+
+module.exports = { getAll, getById, getBySlug }

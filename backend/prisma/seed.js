@@ -44,10 +44,10 @@ async function main() {
 
   // Crear categorías globales (solo el admin puede gestionarlas)
   const categoriasGlobales = [
-    { nombre: 'Bodas Silver', descripcion: 'Celebraciones cuidadas, locaciones confiables y planificación sin estrés.', icono: 'rings', imagen: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800' },
-    { nombre: 'Viajes Silver', descripcion: 'Rutas tranquilas, tiempos humanos y experiencias con sentido.', icono: 'plane', imagen: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800' },
-    { nombre: 'Celebraciones', descripcion: 'Aniversarios, renovación de votos, encuentros familiares.', icono: 'party', imagen: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=800' },
-    { nombre: 'Servicios', descripcion: 'Fotografía, música, catering y aliados verificados para tu evento o viaje.', icono: 'sparkles', imagen: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800' },
+    { nombre: 'Bodas Silver', slug: 'bodas-silver', descripcion: 'Celebraciones cuidadas, locaciones confiables y planificación sin estrés.', icono: 'rings', imagen: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800' },
+    { nombre: 'Viajes Silver', slug: 'viajes-silver', descripcion: 'Rutas tranquilas, tiempos humanos y experiencias con sentido.', icono: 'plane', imagen: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800' },
+    { nombre: 'Celebraciones', slug: 'celebraciones', descripcion: 'Aniversarios, renovación de votos, encuentros familiares.', icono: 'party', imagen: 'https://images.unsplash.com/photo-1533929736458-ca588d08c8be?w=800' },
+    { nombre: 'Servicios', slug: 'servicios', descripcion: 'Fotografía, música, catering y aliados verificados para tu evento o viaje.', icono: 'sparkles', imagen: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800' },
   ]
 
   const categorias = []
@@ -119,6 +119,46 @@ async function main() {
   ])
   console.log('✅ Planes creados:', planes.length)
 
+  // Crear 100 planes de prueba para scroll infinito
+  const ubicaciones = [
+    'Cartagena, Bolívar', 'Medellín, Antioquia', 'Santa Marta, Magdalena',
+    'Bogotá, Cundinamarca', 'Cali, Valle del Cauca', 'Bucaramanga, Santander',
+    'Pereira, Risaralda', 'Barranquilla, Atlántico', 'Villa de Leyva, Boyacá',
+    'Salento, Quindío', 'Barichara, Santander', 'Guatapé, Antioquia',
+    'San Gil, Santander', 'Popayán, Cauca', 'Manizales, Caldas'
+  ]
+  const titulos = [
+    'Escapada romántica', 'Aventura natural', 'Tour cultural', 'Relax total',
+    'Experiencia gastronómica', 'Ruta colonial', 'Senderismo suave',
+    'Paseo por el río', 'Atardecer mágico', 'Recorrido histórico',
+    'Día de spa', 'Tour del café', 'Playa y brisa', 'Noche de gala',
+    'Caminata ecológica', 'Festival local', 'Retiro de bienestar',
+    'Travesía en lancha', 'Visita a hacienda', 'Mirador panorámico'
+  ]
+  const duraciones = ['4 horas', '1 día', '2 días / 1 noche', '3 días / 2 noches', '5 días / 4 noches']
+
+  const bulkPlans = []
+  for (let i = 0; i < 100; i++) {
+    const catIndex = i % categorias.length
+    const precio = 100000 + Math.floor(Math.random() * 4900000)
+    bulkPlans.push({
+      proveedorId: proveedor.id,
+      categoriaId: categorias[catIndex].id,
+      titulo: `${titulos[i % titulos.length]} en ${ubicaciones[i % ubicaciones.length].split(',')[0]}`,
+      descripcion: `Plan especial: ${titulos[i % titulos.length].toLowerCase()} con acompañamiento y comodidad garantizada.`,
+      ubicacion: ubicaciones[i % ubicaciones.length],
+      precio,
+      precioOriginal: Math.random() > 0.7 ? Math.round(precio * 1.25) : null,
+      duracion: duraciones[i % duraciones.length],
+      imagenes: ['https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600'],
+      incluye: ['Transporte', 'Guía', 'Seguro'],
+      amenidades: ['transport', 'guide'],
+      activo: true
+    })
+  }
+  await prisma.plan.createMany({ data: bulkPlans, skipDuplicates: true })
+  console.log('✅ 100 planes de prueba creados')
+
   // Crear Usuario de ejemplo
   const usuarioPassword = await bcrypt.hash('usuario123', 10)
   const usuario = await prisma.usuario.upsert({
@@ -132,6 +172,43 @@ async function main() {
     }
   })
   console.log('✅ Usuario creado:', usuario.email)
+
+  // Crear Testimonios iniciales
+  const testimoniosData = [
+    {
+      nombre: 'María González',
+      ciudad: 'Bogotá',
+      texto: 'Lo que más me gustó fue la claridad. Sabíamos exactamente qué esperar, los accesos, los tiempos y el acompañamiento.',
+      rating: 5,
+      foto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100',
+      orden: 1
+    },
+    {
+      nombre: 'Carlos Rodríguez',
+      ciudad: 'Medellín',
+      texto: 'Mi mamá se sintió cuidada desde el primer mensaje. El equipo fue atento y resolvió todas nuestras dudas sin afán.',
+      rating: 5,
+      foto: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
+      orden: 2
+    },
+    {
+      nombre: 'Ana Martínez',
+      ciudad: 'Manizales',
+      texto: 'El acompañamiento fue excepcional. Nos sentimos tranquilos en todo momento y la experiencia superó nuestras expectativas.',
+      rating: 5,
+      foto: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100',
+      orden: 3
+    }
+  ]
+
+  for (let i = 0; i < testimoniosData.length; i++) {
+    await prisma.testimonio.upsert({
+      where: { id: i + 1 },
+      update: testimoniosData[i],
+      create: { id: i + 1, ...testimoniosData[i] }
+    })
+  }
+  console.log('✅ Testimonios creados:', testimoniosData.length)
 
   console.log('')
   console.log('🎉 Seed completado!')

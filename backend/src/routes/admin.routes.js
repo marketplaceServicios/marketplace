@@ -2,6 +2,10 @@ const express = require('express')
 const router = express.Router()
 const adminController = require('../controllers/adminController')
 const contactoController = require('../controllers/contactoController')
+const testimonioController = require('../controllers/testimonioController')
+const experiencia360Controller = require('../controllers/experiencia360Controller')
+const enlaceRapidoController = require('../controllers/enlaceRapidoController')
+const reviewController = require('../controllers/reviewController')
 const { verifyToken, isAdmin } = require('../middlewares/auth')
 
 // Todas las rutas requieren ser admin
@@ -29,10 +33,47 @@ router.get('/cotizaciones', adminController.getCotizaciones)
 router.get('/contactos', contactoController.getAll)
 router.patch('/contactos/:id/leido', contactoController.marcarLeido)
 
+// Testimonios
+router.get('/testimonios', testimonioController.getAllAdmin)
+router.post('/testimonios', testimonioController.create)
+router.put('/testimonios/:id', testimonioController.update)
+router.delete('/testimonios/:id', testimonioController.remove)
+
+// Experiencias 360
+router.get('/experiencias360', experiencia360Controller.getAllAdmin)
+router.post('/experiencias360', experiencia360Controller.create)
+router.put('/experiencias360/:id', experiencia360Controller.update)
+router.delete('/experiencias360/:id', experiencia360Controller.remove)
+
+// Enlaces rápidos
+router.get('/enlaces-rapidos', enlaceRapidoController.getAllAdmin)
+router.post('/enlaces-rapidos', enlaceRapidoController.create)
+router.put('/enlaces-rapidos/:id', enlaceRapidoController.update)
+router.delete('/enlaces-rapidos/:id', enlaceRapidoController.remove)
+
 // Gestión de planes
 router.get('/planes', adminController.getPlanes)
 router.patch('/planes/:id/toggle', adminController.togglePlan)
 router.patch('/planes/:id/destacado', adminController.toggleDestacado)
 router.patch('/planes/:id/oferta', adminController.toggleEsOferta)
+
+// Gestión de administradores
+router.get('/admins', adminController.getAdmins)
+router.post('/admins', adminController.createAdmin)
+router.put('/admins/:id', adminController.updateAdmin)
+
+// Gestión de clientes
+router.patch('/usuarios/:id/toggle', adminController.toggleUsuario)
+
+// Gestión de equipo (desde admin)
+router.get('/equipo', adminController.getAllEquipo)
+router.post('/equipo', adminController.createEquipoAdmin)
+router.put('/equipo/:id', adminController.updateEquipoAdmin)
+router.delete('/equipo/:id', adminController.deleteEquipoAdmin)
+
+// Reseñas
+router.get('/resenas', reviewController.getAllAdmin)
+router.patch('/resenas/:id/estado', reviewController.updateEstado)
+router.post('/resenas/batch', reviewController.batchUpdateEstado)
 
 module.exports = router

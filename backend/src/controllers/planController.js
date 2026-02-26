@@ -1,9 +1,16 @@
 const prisma = require('../config/database')
 
-// Obtener todos los planes (público)
+// Obtener todos los planes (público) — con paginación, búsqueda y filtros de precio
 const getAll = async (req, res) => {
   try {
-    const { categoriaId, proveedorId, destacado, esOferta } = req.query
+    const {
+      categoriaId, proveedorId, destacado, esOferta,
+      page: rawPage, limit: rawLimit, q, precioMin, precioMax
+    } = req.query
+
+    const page = Math.max(1, parseInt(rawPage) || 1)
+    const limit = Math.min(100, Math.max(1, parseInt(rawLimit) || 20))
+    const skip = (page - 1) * limit
 
     const where = { activo: true }
 
@@ -12,16 +19,58 @@ const getAll = async (req, res) => {
     if (destacado === 'true') where.destacado = true
     if (esOferta === 'true') where.esOferta = true
 
-    const planes = await prisma.plan.findMany({
-      where,
-      include: {
-        categoria: { select: { id: true, nombre: true } },
-        proveedor: { select: { id: true, nombreEmpresa: true, logo: true } }
-      },
-      orderBy: { id: 'desc' }
-    })
+    // Text search (MySQL is case-insensitive by default, no mode needed)
+    if (q) {
+      where.OR = [
+        { titulo: { contains: q } },
+        { ubicacion: { contains: q } }
+      ]
+    }
 
-    res.json(planes)
+    // Price range filters
+    if (precioMin || precioMax) {
+      where.precio = {}
+      if (precioMin) where.precio.gte = parseFloat(precioMin)
+      if (precioMax) where.precio.lte = parseFloat(precioMax)
+    }
+
+    const [planes, total] = await Promise.all([
+      prisma.plan.findMany({
+        where,
+        include: {
+          categoria: { select: { id: true, nombre: true, slug: true } },
+          proveedor: { select: { id: true, nombreEmpresa: true, logo: true } }
+        },
+        orderBy: { id: 'desc' },
+        skip,
+        take: limit
+      }),
+      prisma.plan.count({ where })
+    ])
+
+    // Agregar ratings dinámicos
+    const planIds = planes.map(p => p.id)
+    const ratings = await prisma.resena.groupBy({
+      by: ['planId'],
+      where: { planId: { in: planIds }, estado: 'aprobado' },
+      _avg: { rating: true },
+      _count: { id: true }
+    })
+    const ratingsMap = {}
+    ratings.forEach(r => { ratingsMap[r.planId] = { avg: r._avg.rating, count: r._count.id } })
+
+    const planesConRating = planes.map(p => ({
+      ...p,
+      _rating: ratingsMap[p.id] ? parseFloat(ratingsMap[p.id].avg.toFixed(1)) : 0,
+      _reviewCount: ratingsMap[p.id]?.count || 0
+    }))
+
+    res.json({
+      data: planesConRating,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit)
+    })
   } catch (error) {
     console.error('Error en getAll planes:', error)
     res.status(500).json({ error: 'Error al obtener planes' })
@@ -34,14 +83,30 @@ const getFeatured = async (req, res) => {
     const planes = await prisma.plan.findMany({
       where: { activo: true, destacado: true },
       include: {
-        categoria: { select: { id: true, nombre: true } },
+        categoria: { select: { id: true, nombre: true, slug: true } },
         proveedor: { select: { id: true, nombreEmpresa: true } }
       },
       take: 6,
       orderBy: { id: 'desc' }
     })
 
-    res.json(planes)
+    const planIds = planes.map(p => p.id)
+    const ratings = await prisma.resena.groupBy({
+      by: ['planId'],
+      where: { planId: { in: planIds }, estado: 'aprobado' },
+      _avg: { rating: true },
+      _count: { id: true }
+    })
+    const ratingsMap = {}
+    ratings.forEach(r => { ratingsMap[r.planId] = { avg: r._avg.rating, count: r._count.id } })
+
+    const planesConRating = planes.map(p => ({
+      ...p,
+      _rating: ratingsMap[p.id] ? parseFloat(ratingsMap[p.id].avg.toFixed(1)) : 0,
+      _reviewCount: ratingsMap[p.id]?.count || 0
+    }))
+
+    res.json(planesConRating)
   } catch (error) {
     console.error('Error en getFeatured planes:', error)
     res.status(500).json({ error: 'Error al obtener planes destacados' })
@@ -54,13 +119,29 @@ const getOffers = async (req, res) => {
     const planes = await prisma.plan.findMany({
       where: { activo: true, esOferta: true },
       include: {
-        categoria: { select: { id: true, nombre: true } },
+        categoria: { select: { id: true, nombre: true, slug: true } },
         proveedor: { select: { id: true, nombreEmpresa: true } }
       },
       orderBy: { id: 'desc' }
     })
 
-    res.json(planes)
+    const planIds = planes.map(p => p.id)
+    const ratings = await prisma.resena.groupBy({
+      by: ['planId'],
+      where: { planId: { in: planIds }, estado: 'aprobado' },
+      _avg: { rating: true },
+      _count: { id: true }
+    })
+    const ratingsMap = {}
+    ratings.forEach(r => { ratingsMap[r.planId] = { avg: r._avg.rating, count: r._count.id } })
+
+    const planesConRating = planes.map(p => ({
+      ...p,
+      _rating: ratingsMap[p.id] ? parseFloat(ratingsMap[p.id].avg.toFixed(1)) : 0,
+      _reviewCount: ratingsMap[p.id]?.count || 0
+    }))
+
+    res.json(planesConRating)
   } catch (error) {
     console.error('Error en getOffers planes:', error)
     res.status(500).json({ error: 'Error al obtener ofertas' })
@@ -86,7 +167,17 @@ const getById = async (req, res) => {
       return res.status(404).json({ error: 'Plan no encontrado' })
     }
 
-    res.json(plan)
+    const agg = await prisma.resena.aggregate({
+      where: { planId: plan.id, estado: 'aprobado' },
+      _avg: { rating: true },
+      _count: { id: true }
+    })
+
+    res.json({
+      ...plan,
+      _rating: agg._avg.rating ? parseFloat(agg._avg.rating.toFixed(1)) : 0,
+      _reviewCount: agg._count.id
+    })
   } catch (error) {
     console.error('Error en getById plan:', error)
     res.status(500).json({ error: 'Error al obtener plan' })

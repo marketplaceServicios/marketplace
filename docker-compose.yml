@@ -1,20 +1,69 @@
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: vive-silver-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: vivesilver
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend
+
+  api:
+    image: ghcr.io/marketplaceservicios/vive-silver-api:latest
+    pull_policy: always
+    container_name: vive-silver-api
+    restart: always
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@vive-silver-mysql:3306/vivesilver
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 7d
+      ADMIN_URL: https://admin.vivesilver.com
+      PROVEEDOR_URL: https://proveedor.vivesilver.com
+      WEB_URL: https://vivesilver.com
+      HCAPTCHA_SECRET_KEY: ${HCAPTCHA_SECRET_KEY}
+      WOMPI_PUBLIC_KEY: ${WOMPI_PUBLIC_KEY}
+      WOMPI_INTEGRITY_SECRET: ${WOMPI_INTEGRITY_SECRET}
+      WOMPI_EVENTS_SECRET: ${WOMPI_EVENTS_SECRET}
+    volumes:
+      - api_uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - proxy
+      - backend
+
   admin:
-    build:
-      context: ./admin
-      dockerfile: Dockerfile
+    image: ghcr.io/marketplaceservicios/vive-silver-admin:latest
+    pull_policy: always
     container_name: vive-silver-admin
     restart: always
     networks:
       - proxy
+
   proveedor:
-    build:
-      context: ./proveedor
-      dockerfile: Dockerfile
+    image: ghcr.io/marketplaceservicios/vive-silver-proveedor:latest
+    pull_policy: always
     container_name: vive-silver-proveedor
     restart: always
     networks:
       - proxy
+
+volumes:
+  mysql_data:
+  api_uploads:
+
 networks:
   proxy:
     external: true
+  backend:

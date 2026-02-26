@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:4000/api'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api'
 
 const getToken = () => localStorage.getItem('admin_token')
 
@@ -14,6 +14,12 @@ const request = async (method, path, body) => {
   })
 
   const data = await res.json()
+  if (res.status === 401 || res.status === 403) {
+    localStorage.removeItem('admin_token')
+    alert(data.error || 'Tu sesión ha expirado o tu cuenta fue desactivada. Inicia sesión nuevamente.')
+    window.location.href = '/login'
+    throw new Error(data.error || 'Sesión inválida')
+  }
   if (!res.ok) throw new Error(data.error || 'Error en la solicitud')
   return data
 }
@@ -35,6 +41,12 @@ export const api = {
       body: form,
     })
     const data = await res.json()
+    if (res.status === 401 || res.status === 403) {
+      localStorage.removeItem('admin_token')
+      alert(data.error || 'Tu sesión ha expirado o tu cuenta fue desactivada. Inicia sesión nuevamente.')
+      window.location.href = '/login'
+      throw new Error(data.error || 'Sesión inválida')
+    }
     if (!res.ok) throw new Error(data.error || 'Error al subir imagen')
     return data.url
   }
