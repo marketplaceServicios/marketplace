@@ -400,7 +400,6 @@ const getIngresos = async (req, res) => {
   }
 }
 
-module.exports = { getDashboard, getUsuarios, getCategorias, createCategoria, updateCategoria, deleteCategoria, getPlanes, togglePlan, toggleDestacado, toggleEsOferta, getCotizaciones, getIngresos, getReservas }
 // ==================== ADMINISTRADORES ====================
 
 // Obtener todos los admins
@@ -577,4 +576,4 @@ const deleteEquipoAdmin = async (req, res) => {
   }
 }
 
-module.exports = { getDashboard, getUsuarios, getCategorias, createCategoria, updateCategoria, deleteCategoria, getPlanes, togglePlan, toggleDestacado, toggleEsOferta, getCotizaciones, getAdmins, createAdmin, updateAdmin, toggleUsuario, getAllEquipo, createEquipoAdmin, updateEquipoAdmin, deleteEquipoAdmin }
+module.exports = { getDashboard, getUsuarios, getCategorias, createCategoria, updateCategoria, deleteCategoria, getPlanes, togglePlan, toggleDestacado, toggleEsOferta, getCotizaciones, getIngresos, getReservas, getAdmins, createAdmin, updateAdmin, toggleUsuario, getAllEquipo, createEquipoAdmin, updateEquipoAdmin, deleteEquipoAdmin }
