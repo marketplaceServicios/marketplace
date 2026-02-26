@@ -14,7 +14,8 @@ import {
   BookOpen,
   Tag,
   MessageSquare,
-  Inbox
+  Inbox,
+  Star
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/lib/utils'
@@ -28,6 +29,7 @@ const menuItems = [
   { path: '/planes-admin', icon: FileText, label: 'Planes' },
   { path: '/cotizaciones', icon: MessageSquare, label: 'Cotizaciones' },
   { path: '/mensajes', icon: Inbox, label: 'Mensajes' },
+  { path: '/resenas', icon: Star, label: 'Reseñas' },
   { path: '/contenido', icon: BookOpen, label: 'Contenido' },
   { path: '/perfil', icon: User, label: 'Mi perfil' },
 ]

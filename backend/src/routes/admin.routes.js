@@ -5,6 +5,7 @@ const contactoController = require('../controllers/contactoController')
 const testimonioController = require('../controllers/testimonioController')
 const experiencia360Controller = require('../controllers/experiencia360Controller')
 const enlaceRapidoController = require('../controllers/enlaceRapidoController')
+const reviewController = require('../controllers/reviewController')
 const { verifyToken, isAdmin } = require('../middlewares/auth')
 
 // Todas las rutas requieren ser admin
@@ -63,5 +64,10 @@ router.get('/equipo', adminController.getAllEquipo)
 router.post('/equipo', adminController.createEquipoAdmin)
 router.put('/equipo/:id', adminController.updateEquipoAdmin)
 router.delete('/equipo/:id', adminController.deleteEquipoAdmin)
+
+// Reseñas
+router.get('/resenas', reviewController.getAllAdmin)
+router.patch('/resenas/:id/estado', reviewController.updateEstado)
+router.post('/resenas/batch', reviewController.batchUpdateEstado)
 
 module.exports = router

@@ -120,6 +120,7 @@ model Plan {
   categoria    Categoria    @relation(fields: [categoriaId], references: [id])
   reservas     Reserva[]
   cotizaciones Cotizacion[]
+  resenas      Resena[]
 
   @@map("planes")
 }
@@ -168,6 +169,24 @@ model Cotizacion {
   usuario Usuario? @relation(fields: [usuarioId], references: [id])
 
   @@map("cotizaciones")
+}
+
+// ==================== RESEÑAS ====================
+
+model Resena {
+  id         Int      @id @default(autoincrement())
+  planId     Int
+  nombre     String
+  email      String
+  rating     Int      // 1-5
+  comentario String   @db.VarChar(200)
+  estado     String   @default("pendiente") // pendiente, aprobado, rechazado
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@map("resenas")
 }
 
 // ==================== CONTACTO ====================

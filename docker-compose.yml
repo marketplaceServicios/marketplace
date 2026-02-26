@@ -30,6 +30,7 @@ services:
       ADMIN_URL: https://admin.vivesilver.com
       PROVEEDOR_URL: https://proveedor.vivesilver.com
       WEB_URL: https://vivesilver.com
+      HCAPTCHA_SECRET_KEY: ${HCAPTCHA_SECRET_KEY}
     volumes:
       - api_uploads:/app/uploads
     depends_on:
