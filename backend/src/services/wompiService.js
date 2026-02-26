@@ -22,7 +22,13 @@ function buildCheckoutUrl({ reference, amountCents, currency, email, redirectUrl
     params.set('customer-data:email', email)
   }
 
-  return `https://checkout.wompi.co/p/?${params.toString()}`
+  const publicKey = process.env.WOMPI_PUBLIC_KEY || ''
+  const isSandbox = publicKey.startsWith('pub_test_')
+  const baseUrl = isSandbox
+    ? 'https://sandbox.wompi.co/p/'
+    : 'https://checkout.wompi.co/p/'
+
+  return `${baseUrl}?${params.toString()}`
 }
 
 /**

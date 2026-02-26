@@ -110,6 +110,11 @@ model Plan {
   notasAccesibilidad    String?  @db.Text
   politicasCancelacion  String?  @db.Text
   disponibilidad        Json?    // { tipo, diasSemana?, precioFinDeSemana?, fechasEspeciales? }
+  contactoCelular       String?
+  contactoEmail         String?
+  cupoMaximoDiario      Int?
+  cobrarIva             Boolean  @default(false)
+  porcentajeIva         Int      @default(19)
   destacado             Boolean  @default(false)
   esOferta              Boolean  @default(false)
   activo         Boolean  @default(true)
@@ -131,7 +136,7 @@ model Reserva {
   id               Int      @id @default(autoincrement())
   codigo           String   @unique
   planId           Int
-  usuarioId        Int
+  usuarioId        Int?
   numPersonas      Int
   turistas         Json?    // Array de objetos con datos de turistas
   datosFacturacion Json?    // Objeto con datos de facturación
@@ -143,8 +148,8 @@ model Reserva {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  plan    Plan    @relation(fields: [planId], references: [id])
-  usuario Usuario @relation(fields: [usuarioId], references: [id])
+  plan    Plan     @relation(fields: [planId], references: [id])
+  usuario Usuario? @relation(fields: [usuarioId], references: [id])
 
   @@map("reservas")
 }

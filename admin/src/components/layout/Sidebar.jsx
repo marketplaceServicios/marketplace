@@ -15,6 +15,8 @@ import {
   Tag,
   MessageSquare,
   Inbox,
+  TrendingUp,
+  BookMarked,
   Star
 } from 'lucide-react'
 import { useAuthStore } from '@/store/authStore'
@@ -27,8 +29,10 @@ const menuItems = [
   { path: '/usuarios-registrados', icon: Users, label: 'Usuarios registrados' },
   { path: '/categorias', icon: Tag, label: 'Categorías' },
   { path: '/planes-admin', icon: FileText, label: 'Planes' },
+  { path: '/reservas', icon: BookMarked, label: 'Reservas activas' },
   { path: '/cotizaciones', icon: MessageSquare, label: 'Cotizaciones' },
   { path: '/mensajes', icon: Inbox, label: 'Mensajes' },
+  { path: '/ingresos', icon: TrendingUp, label: 'Ingresos' },
   { path: '/resenas', icon: Star, label: 'Reseñas' },
   { path: '/contenido', icon: BookOpen, label: 'Contenido' },
   { path: '/perfil', icon: User, label: 'Mi perfil' },

@@ -213,11 +213,13 @@ const create = async (req, res) => {
       categoriaId, titulo, descripcion, ubicacion,
       precio, precioOriginal, duracion, fechaInicio, fechaFin,
       imagenes, incluye, amenidades, datoClave, notasAccesibilidad,
-      politicasCancelacion, disponibilidad, destacado, esOferta
+      politicasCancelacion, disponibilidad, destacado, esOferta,
+      contactoCelular, contactoEmail, cupoMaximoDiario,
+      cobrarIva, porcentajeIva
     } = req.body
 
-    if (!categoriaId || !titulo || !precio) {
-      return res.status(400).json({ error: 'Categoría, título y precio son requeridos' })
+    if (!categoriaId || !titulo || !precio || !contactoCelular || !contactoEmail) {
+      return res.status(400).json({ error: 'Categoría, título, precio, celular y correo de contacto son requeridos' })
     }
 
     // Verificar que la categoría existe y está activa
@@ -248,6 +250,11 @@ const create = async (req, res) => {
         notasAccesibilidad,
         politicasCancelacion,
         disponibilidad: disponibilidad || null,
+        contactoCelular,
+        contactoEmail,
+        cupoMaximoDiario: cupoMaximoDiario ? parseInt(cupoMaximoDiario) : null,
+        cobrarIva: cobrarIva === true || cobrarIva === 'true',
+        porcentajeIva: porcentajeIva ? parseInt(porcentajeIva) : 19,
         destacado: destacado || false,
         esOferta: esOferta || false
       },
@@ -275,7 +282,9 @@ const update = async (req, res) => {
       categoriaId, titulo, descripcion, ubicacion,
       precio, precioOriginal, duracion, fechaInicio, fechaFin,
       imagenes, incluye, amenidades, datoClave, notasAccesibilidad,
-      politicasCancelacion, disponibilidad, destacado, esOferta, activo
+      politicasCancelacion, disponibilidad, destacado, esOferta, activo,
+      contactoCelular, contactoEmail, cupoMaximoDiario,
+      cobrarIva, porcentajeIva
     } = req.body
 
     // Verificar que el plan pertenece al proveedor
@@ -306,6 +315,13 @@ const update = async (req, res) => {
         notasAccesibilidad,
         politicasCancelacion,
         disponibilidad: disponibilidad !== undefined ? disponibilidad : undefined,
+        contactoCelular,
+        contactoEmail,
+        cupoMaximoDiario: cupoMaximoDiario !== undefined
+          ? (cupoMaximoDiario ? parseInt(cupoMaximoDiario) : null)
+          : undefined,
+        cobrarIva: cobrarIva !== undefined ? (cobrarIva === true || cobrarIva === 'true') : undefined,
+        porcentajeIva: porcentajeIva !== undefined ? parseInt(porcentajeIva) : undefined,
         destacado,
         esOferta,
         activo
@@ -351,6 +367,36 @@ const remove = async (req, res) => {
   }
 }
 
+// Obtener fechas con cupo lleno para un plan (público)
+const getFechasLlenas = async (req, res) => {
+  try {
+    const { id } = req.params
+    const plan = await prisma.plan.findUnique({
+      where: { id: parseInt(id), activo: true },
+      select: { cupoMaximoDiario: true }
+    })
+
+    if (!plan || !plan.cupoMaximoDiario) return res.json([])
+
+    const result = await prisma.$queryRaw`
+      SELECT
+        JSON_UNQUOTE(JSON_EXTRACT(datosFacturacion, '$.selectedDate')) AS fecha,
+        COUNT(*) AS cnt
+      FROM reservas
+      WHERE planId = ${parseInt(id)}
+        AND estado NOT IN ('cancelada')
+        AND JSON_EXTRACT(datosFacturacion, '$.selectedDate') IS NOT NULL
+      GROUP BY fecha
+      HAVING cnt >= ${plan.cupoMaximoDiario}
+    `
+
+    res.json(result.map((r) => r.fecha).filter(Boolean))
+  } catch (error) {
+    console.error('Error en getFechasLlenas:', error)
+    res.status(500).json({ error: 'Error al obtener fechas' })
+  }
+}
+
 module.exports = {
   getAll,
   getFeatured,
@@ -359,5 +405,6 @@ module.exports = {
   getMyPlanes,
   create,
   update,
-  remove
+  remove,
+  getFechasLlenas
 }

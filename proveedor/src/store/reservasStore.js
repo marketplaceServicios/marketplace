@@ -3,19 +3,23 @@ import { api } from '@/lib/api'
 
 const COLORS = ['teal', 'green', 'blue', 'amber', 'purple', 'pink']
 
-const mapReserva = (r, i) => ({
-  id: r.id,
-  codigo: r.codigo,
-  fecha: r.createdAt?.split('T')[0] || '',
-  servicio: r.plan?.titulo || '—',
-  cliente: r.usuario?.nombre || '—',
-  cantidadPersonas: r.numPersonas,
-  valorPagado: Number(r.total),
-  estado: r.estado,
-  color: COLORS[i % COLORS.length],
-  turistas: r.turistas || [],
-  metodoPago: r.metodoPago || '—',
-})
+const mapReserva = (r, i) => {
+  const df = r.datosFacturacion || {}
+  return {
+    id: r.id,
+    codigo: r.codigo,
+    fecha: df.selectedDate || r.createdAt?.split('T')[0] || '',
+    servicio: r.plan?.titulo || '—',
+    cliente: df.name || r.usuario?.nombre || '—',
+    cantidadPersonas: r.numPersonas,
+    valorPagado: Number(r.total),
+    estado: r.estado,
+    color: COLORS[i % COLORS.length],
+    turistas: Array.isArray(r.turistas) ? r.turistas : [],
+    metodoPago: r.metodoPago || '—',
+    datosFacturacion: df,
+  }
+}
 
 export const useReservasStore = create((set, get) => ({
   reservas: [],
@@ -39,7 +43,10 @@ export const useReservasStore = create((set, get) => ({
   getReservasByDate: (date) => {
     const reservas = get().reservas
     if (!date) return []
-    const dateStr = date.toISOString().split('T')[0]
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    const dateStr = `${y}-${m}-${d}`
     return reservas.filter((r) => r.fecha === dateStr)
   },
 
@@ -61,7 +68,10 @@ export const useReservasStore = create((set, get) => ({
   },
 
   bloquearFecha: (date) => {
-    const dateStr = date.toISOString().split('T')[0]
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    const dateStr = `${y}-${m}-${d}`
     set((state) => ({
       fechasBloqueadas: [...state.fechasBloqueadas, dateStr]
     }))

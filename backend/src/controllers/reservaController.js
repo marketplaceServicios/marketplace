@@ -29,8 +29,27 @@ const create = async (req, res) => {
       return res.status(404).json({ error: 'Plan no encontrado' })
     }
 
+    // Verificar cupo máximo por día si está configurado
+    const selectedDate = datosFacturacion?.selectedDate
+    if (plan.cupoMaximoDiario && selectedDate) {
+      const result = await prisma.$queryRaw`
+        SELECT COUNT(*) as cnt FROM reservas
+        WHERE planId = ${parseInt(planId)}
+        AND JSON_UNQUOTE(JSON_EXTRACT(datosFacturacion, '$.selectedDate')) = ${selectedDate}
+        AND estado NOT IN ('cancelada')
+      `
+      const ocupadas = Number(result[0]?.cnt || 0)
+      if (ocupadas >= plan.cupoMaximoDiario) {
+        return res.status(409).json({
+          error: `No hay disponibilidad para esta fecha. Este plan permite máximo ${plan.cupoMaximoDiario} reserva${plan.cupoMaximoDiario !== 1 ? 's' : ''} por día.`
+        })
+      }
+    }
+
     const subtotal = parseFloat(plan.precio) * numPersonas
-    const impuestos = subtotal * 0.19
+    const impuestos = plan.cobrarIva
+      ? Math.round(subtotal * (plan.porcentajeIva / 100) * 100) / 100
+      : 0
     const total = subtotal + impuestos
 
     const reserva = await prisma.reserva.create({
@@ -40,7 +59,11 @@ const create = async (req, res) => {
         usuarioId: usuarioId || null,
         numPersonas,
         turistas: turistas || [],
-        datosFacturacion: datosFacturacion || {},
+        datosFacturacion: {
+          ...(datosFacturacion || {}),
+          cobrarIva: plan.cobrarIva,
+          porcentajeIva: plan.porcentajeIva,
+        },
         metodoPago,
         subtotal,
         impuestos,
@@ -159,9 +182,13 @@ const getByCodigo = async (req, res) => {
         plan: {
           select: {
             titulo: true,
+            descripcion: true,
+            incluye: true,
             ubicacion: true,
             duracion: true,
             imagenes: true,
+            contactoCelular: true,
+            contactoEmail: true,
             categoria: { select: { nombre: true } }
           }
         }
@@ -179,4 +206,84 @@ const getByCodigo = async (req, res) => {
   }
 }
 
-module.exports = { create, getByProveedor, getById, updateEstado, getByCodigo }
+// Simular pago aprobado (solo en desarrollo)
+const simularPago = async (req, res) => {
+  if (process.env.NODE_ENV !== 'development') {
+    return res.status(403).json({ error: 'Solo disponible en desarrollo' })
+  }
+  try {
+    const { codigo } = req.params
+    const reserva = await prisma.reserva.update({
+      where: { codigo },
+      data: { estado: 'confirmada' }
+    })
+    res.json({ message: 'Pago simulado exitosamente', reserva })
+  } catch (error) {
+    res.status(500).json({ error: 'Error al simular pago' })
+  }
+}
+
+// Resumen de ingresos para el proveedor (solo sus planes)
+const getIngresosProveedor = async (req, res) => {
+  try {
+    const proveedorId = req.proveedor.id
+
+    const reservas = await prisma.reserva.findMany({
+      where: {
+        estado: 'confirmada',
+        plan: { proveedorId }
+      },
+      include: {
+        plan: { select: { id: true, titulo: true } }
+      },
+      orderBy: { updatedAt: 'desc' }
+    })
+
+    const totalIngresos = reservas.reduce((acc, r) => acc + Number(r.total), 0)
+    const totalReservas = reservas.length
+
+    const byPlan = {}
+    reservas.forEach(r => {
+      if (!r.plan) return
+      const pid = r.plan.id
+      if (!byPlan[pid]) {
+        byPlan[pid] = {
+          id: pid,
+          titulo: r.plan.titulo,
+          totalIngresos: 0,
+          numReservas: 0
+        }
+      }
+      byPlan[pid].totalIngresos += Number(r.total)
+      byPlan[pid].numReservas++
+    })
+
+    const detalleReservas = reservas.map(r => {
+      const df = r.datosFacturacion || {}
+      const turistas = Array.isArray(r.turistas) ? r.turistas : []
+      const clienteNombre = turistas[0]?.name || df.email || '—'
+      return {
+        id: r.id,
+        codigo: r.codigo,
+        fechaPago: r.updatedAt,
+        total: Number(r.total),
+        planTitulo: r.plan?.titulo || '—',
+        clienteNombre,
+        clienteEmail: df.email || '—',
+        numPersonas: r.numPersonas,
+      }
+    })
+
+    res.json({
+      totalIngresos,
+      totalReservas,
+      porPlan: Object.values(byPlan).sort((a, b) => b.totalIngresos - a.totalIngresos),
+      reservas: detalleReservas,
+    })
+  } catch (error) {
+    console.error('Error en getIngresosProveedor:', error)
+    res.status(500).json({ error: 'Error al obtener ingresos' })
+  }
+}
+
+module.exports = { create, getByProveedor, getById, updateEstado, getByCodigo, simularPago, getIngresosProveedor }
