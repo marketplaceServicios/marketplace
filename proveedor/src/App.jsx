@@ -12,6 +12,7 @@ import { ReservasPage } from './pages/ReservasPage'
 import { CotizacionesPage } from './pages/CotizacionesPage'
 import { TodasCotizacionesPage } from './pages/TodasCotizacionesPage'
 import { DetalleCotizacionPage } from './pages/DetalleCotizacionPage'
+import { IngresosPage } from './pages/IngresosPage'
 import { EquipoPage } from './pages/EquipoPage'
 import { CrearUsuarioPage } from './pages/CrearUsuarioPage'
 import { PerfilPage } from './pages/PerfilPage'
@@ -59,6 +60,7 @@ function App() {
           <Route path="/editar-plan/:id" element={<EditarPlanPage />} />
           <Route path="/categorias" element={<CategoriasPage />} />
           <Route path="/reservas" element={<ReservasPage />} />
+          <Route path="/ingresos" element={<IngresosPage />} />
           <Route path="/cotizaciones" element={<CotizacionesPage />} />
           <Route path="/cotizaciones/todas" element={<TodasCotizacionesPage />} />
           <Route path="/cotizaciones/:id" element={<DetalleCotizacionPage />} />

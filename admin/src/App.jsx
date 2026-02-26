@@ -15,6 +15,8 @@ import { PerfilPage } from '@/pages/PerfilPage'
 import { PlanesAdminPage } from '@/pages/PlanesAdminPage'
 import { CotizacionesAdminPage } from '@/pages/CotizacionesAdminPage'
 import { MensajesPage } from '@/pages/MensajesPage'
+import { IngresosAdminPage } from '@/pages/IngresosAdminPage'
+import { ReservasAdminPage } from '@/pages/ReservasAdminPage'
 import { ContenidoPage } from '@/pages/ContenidoPage'
 import { useEffect } from 'react'
 import { useAuthStore } from '@/store/authStore'
@@ -52,6 +54,8 @@ function App() {
         <Route path="/planes-admin" element={<PlanesAdminPage />} />
         <Route path="/cotizaciones" element={<CotizacionesAdminPage />} />
         <Route path="/mensajes" element={<MensajesPage />} />
+        <Route path="/ingresos" element={<IngresosAdminPage />} />
+        <Route path="/reservas" element={<ReservasAdminPage />} />
         <Route path="/contenido" element={<ContenidoPage />} />
         <Route path="/perfil" element={<PerfilPage />} />
       </Route>

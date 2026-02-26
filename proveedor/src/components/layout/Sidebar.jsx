@@ -7,6 +7,7 @@ import {
   Grid3X3,
   Calendar,
   DollarSign,
+  TrendingUp,
   Users,
   User,
   LogOut,
@@ -24,6 +25,7 @@ const menuItems = [
   { icon: Plus, label: 'Crear plan', path: '/crear-plan' },
   { icon: Grid3X3, label: 'Categorías', path: '/categorias' },
   { icon: Calendar, label: 'Reservas activas', path: '/reservas' },
+  { icon: TrendingUp, label: 'Ingresos', path: '/ingresos' },
   {
     icon: DollarSign,
     label: 'Cotizaciones',

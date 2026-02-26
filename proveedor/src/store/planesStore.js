@@ -19,6 +19,11 @@ const mapPlan = (p) => ({
   notasAccesibilidad: p.notasAccesibilidad || '',
   politicasCancelacion: p.politicasCancelacion || '',
   disponibilidad: p.disponibilidad || null,
+  contactoCelular: p.contactoCelular || '',
+  contactoEmail: p.contactoEmail || '',
+  cupoMaximoDiario: p.cupoMaximoDiario || null,
+  cobrarIva: p.cobrarIva ?? false,
+  porcentajeIva: p.porcentajeIva ?? 19,
   precioOriginal: p.precioOriginal ? Number(p.precioOriginal) : null,
   isPrincipal: p.destacado,
   isOferta: p.esOferta,
@@ -57,6 +62,11 @@ export const usePlanesStore = create((set, get) => ({
       notasAccesibilidad: plan.notasAccesibilidad,
       politicasCancelacion: plan.politicasCancelacion,
       disponibilidad: plan.disponibilidad || null,
+      contactoCelular: plan.contactoCelular || '',
+      contactoEmail: plan.contactoEmail || '',
+      cupoMaximoDiario: plan.cupoMaximoDiario ? parseInt(plan.cupoMaximoDiario) : null,
+      cobrarIva: plan.cobrarIva ?? false,
+      porcentajeIva: plan.cobrarIva ? (parseInt(plan.porcentajeIva) || 19) : 19,
       destacado: false,
       esOferta: false,
     })
@@ -80,6 +90,11 @@ export const usePlanesStore = create((set, get) => ({
       notasAccesibilidad: planData.notasAccesibilidad,
       politicasCancelacion: planData.politicasCancelacion,
       disponibilidad: planData.disponibilidad || null,
+      contactoCelular: planData.contactoCelular || '',
+      contactoEmail: planData.contactoEmail || '',
+      cupoMaximoDiario: planData.cupoMaximoDiario ? parseInt(planData.cupoMaximoDiario) : null,
+      cobrarIva: planData.cobrarIva ?? false,
+      porcentajeIva: planData.cobrarIva ? (parseInt(planData.porcentajeIva) || 19) : 19,
     })
     const updated = mapPlan(data.plan)
     set((state) => ({

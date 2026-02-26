@@ -282,4 +282,97 @@ const getCotizaciones = async (req, res) => {
   }
 }
 
-module.exports = { getDashboard, getUsuarios, getCategorias, createCategoria, updateCategoria, deleteCategoria, getPlanes, togglePlan, toggleDestacado, toggleEsOferta, getCotizaciones }
+// Obtener todas las reservas (Admin)
+const getReservas = async (req, res) => {
+  try {
+    const { estado } = req.query
+    const where = {}
+    if (estado) where.estado = estado
+
+    const reservas = await prisma.reserva.findMany({
+      where,
+      include: {
+        plan: {
+          select: {
+            id: true,
+            titulo: true,
+            proveedor: { select: { id: true, nombreEmpresa: true } }
+          }
+        },
+        usuario: { select: { id: true, nombre: true, email: true } }
+      },
+      orderBy: { id: 'desc' }
+    })
+
+    res.json(reservas)
+  } catch (error) {
+    console.error('Error en getReservas admin:', error)
+    res.status(500).json({ error: 'Error al obtener reservas' })
+  }
+}
+
+// Resumen de ingresos para el admin (todas las reservas confirmadas)
+const getIngresos = async (req, res) => {
+  try {
+    const reservas = await prisma.reserva.findMany({
+      where: { estado: 'confirmada' },
+      include: {
+        plan: {
+          select: {
+            id: true,
+            titulo: true,
+            proveedor: { select: { id: true, nombreEmpresa: true } }
+          }
+        }
+      },
+      orderBy: { updatedAt: 'desc' }
+    })
+
+    const totalIngresos = reservas.reduce((acc, r) => acc + Number(r.total), 0)
+    const totalReservas = reservas.length
+
+    const byProveedor = {}
+    reservas.forEach(r => {
+      if (!r.plan?.proveedor) return
+      const pid = r.plan.proveedor.id
+      if (!byProveedor[pid]) {
+        byProveedor[pid] = {
+          id: pid,
+          nombreEmpresa: r.plan.proveedor.nombreEmpresa,
+          totalIngresos: 0,
+          numReservas: 0
+        }
+      }
+      byProveedor[pid].totalIngresos += Number(r.total)
+      byProveedor[pid].numReservas++
+    })
+
+    const detalleReservas = reservas.map(r => {
+      const df = r.datosFacturacion || {}
+      const turistas = Array.isArray(r.turistas) ? r.turistas : []
+      const clienteNombre = turistas[0]?.name || df.email || '—'
+      return {
+        id: r.id,
+        codigo: r.codigo,
+        fechaPago: r.updatedAt,
+        total: Number(r.total),
+        planTitulo: r.plan?.titulo || '—',
+        proveedorNombre: r.plan?.proveedor?.nombreEmpresa || '—',
+        clienteNombre,
+        clienteEmail: df.email || '—',
+      }
+    })
+
+    res.json({
+      totalIngresos,
+      totalReservas,
+      porProveedor: Object.values(byProveedor).sort((a, b) => b.totalIngresos - a.totalIngresos),
+      reservas: detalleReservas,
+    })
+  } catch (error) {
+    console.error('Error en getIngresos admin:', error)
+    res.status(500).json({ error: 'Error al obtener ingresos' })
+  }
+}
+
+module.exports = { getDashboard, getUsuarios, getCategorias, createCategoria, updateCategoria, deleteCategoria, getPlanes, togglePlan, toggleDestacado, toggleEsOferta, getCotizaciones, getIngresos, getReservas }

@@ -16,6 +16,12 @@ router.post('/categorias', adminController.createCategoria)
 router.put('/categorias/:id', adminController.updateCategoria)
 router.delete('/categorias/:id', adminController.deleteCategoria)
 
+// Reservas
+router.get('/reservas', adminController.getReservas)
+
+// Ingresos
+router.get('/ingresos', adminController.getIngresos)
+
 // Cotizaciones
 router.get('/cotizaciones', adminController.getCotizaciones)
 

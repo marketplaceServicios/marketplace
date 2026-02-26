@@ -12,7 +12,7 @@ import { DisponibilidadForm } from '@/components/forms/DisponibilidadForm'
 import { AmenitiesSelector } from '@/components/forms/AmenitiesSelector'
 import { usePlanesStore } from '@/store/planesStore'
 import { useCategoriasStore } from '@/store/categoriasStore'
-import { Save, ArrowLeft, Info, Plus, X } from 'lucide-react'
+import { Save, ArrowLeft, Info, Plus, X, AlertCircle } from 'lucide-react'
 
 export function EditarPlanPage() {
   const { id } = useParams()
@@ -24,7 +24,17 @@ export function EditarPlanPage() {
   const fetchCategorias = useCategoriasStore((state) => state.fetchCategorias)
 
   const [error, setError] = useState('')
+  const [camposFaltantes, setCamposFaltantes] = useState([])
   const [ready, setReady] = useState(false)
+
+  const CAMPOS_REQUERIDOS = [
+    { key: 'titulo', label: 'Título del plan' },
+    { key: 'descripcion', label: 'Descripción amplia' },
+    { key: 'valor', label: 'Valor del plan (precio)' },
+    { key: 'categoriaId', label: 'Categoría' },
+    { key: 'contactoCelular', label: 'Celular de contacto' },
+    { key: 'contactoEmail', label: 'Correo de contacto' },
+  ]
 
   const [formData, setFormData] = useState({
     titulo: '',
@@ -35,7 +45,12 @@ export function EditarPlanPage() {
     duracion: '',
     accesibilidad: '',
     notasAccesibilidad: '',
-    politicasCancelacion: ''
+    politicasCancelacion: '',
+    contactoCelular: '',
+    contactoEmail: '',
+    cupoMaximoDiario: '',
+    cobrarIva: false,
+    porcentajeIva: '19',
   })
 
   const [servicios, setServicios] = useState([''])
@@ -71,7 +86,12 @@ export function EditarPlanPage() {
       duracion: plan.duracion || '',
       accesibilidad,
       notasAccesibilidad: plan.notasAccesibilidad || '',
-      politicasCancelacion: plan.politicasCancelacion || ''
+      politicasCancelacion: plan.politicasCancelacion || '',
+      contactoCelular: plan.contactoCelular || '',
+      contactoEmail: plan.contactoEmail || '',
+      cupoMaximoDiario: plan.cupoMaximoDiario ? String(plan.cupoMaximoDiario) : '',
+      cobrarIva: plan.cobrarIva ?? false,
+      porcentajeIva: plan.porcentajeIva ? String(plan.porcentajeIva) : '19',
     })
 
     setServicios(
@@ -110,6 +130,14 @@ export function EditarPlanPage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setCamposFaltantes([])
+
+    const faltantes = CAMPOS_REQUERIDOS.filter(({ key }) => !formData[key]?.toString().trim())
+    if (faltantes.length > 0) {
+      setCamposFaltantes(faltantes.map((f) => f.label))
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
 
     try {
       await updatePlan(parseInt(id), {
@@ -126,6 +154,11 @@ export function EditarPlanPage() {
         incluye: servicios.filter((s) => s.trim()),
         amenidades,
         disponibilidad,
+        contactoCelular: formData.contactoCelular,
+        contactoEmail: formData.contactoEmail,
+        cupoMaximoDiario: formData.cupoMaximoDiario ? parseInt(formData.cupoMaximoDiario) : null,
+        cobrarIva: formData.cobrarIva,
+        porcentajeIva: formData.cobrarIva ? (parseInt(formData.porcentajeIva) || 19) : 19,
       })
       navigate('/planes')
     } catch (err) {
@@ -159,6 +192,25 @@ export function EditarPlanPage() {
           </Button>
         }
       />
+
+      {camposFaltantes.length > 0 && (
+        <div className="p-4 bg-danger/10 border border-danger/30 rounded-lg flex gap-3">
+          <AlertCircle className="h-5 w-5 text-danger flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-danger text-sm mb-2">
+              No puedes guardar el plan hasta completar todos los campos obligatorios:
+            </p>
+            <ul className="space-y-1">
+              {camposFaltantes.map((campo) => (
+                <li key={campo} className="text-sm text-danger flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-danger flex-shrink-0" />
+                  {campo}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="p-3 bg-danger/10 border border-danger/20 rounded-lg text-danger text-sm">
@@ -293,6 +345,43 @@ export function EditarPlanPage() {
                   </p>
                 </div>
 
+                {/* IVA */}
+                <div className="pt-4 border-t border-cream">
+                  <h4 className="text-sm font-semibold text-primary mb-1">Impuestos</h4>
+                  <label className="flex items-center justify-between cursor-pointer gap-3">
+                    <div>
+                      <p className="text-sm text-primary">¿Cobrar IVA al usuario?</p>
+                      <p className="text-xs text-slate mt-0.5">Si no lo activas, asumes tú el costo del impuesto.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, cobrarIva: !formData.cobrarIva })}
+                      className={`relative flex-shrink-0 inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        formData.cobrarIva ? 'bg-primary' : 'bg-gray-200'
+                      }`}
+                    >
+                      <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                        formData.cobrarIva ? 'translate-x-6' : 'translate-x-1'
+                      }`} />
+                    </button>
+                  </label>
+                  {formData.cobrarIva && (
+                    <div className="mt-3">
+                      <FormField
+                        label="Porcentaje de IVA (%)"
+                        name="porcentajeIva"
+                        type="number"
+                        value={formData.porcentajeIva}
+                        onChange={handleChange}
+                        placeholder="19"
+                      />
+                      <p className="text-xs text-slate mt-1">
+                        Se sumará al precio base. El usuario verá el desglose.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 <FormField
                   label="Lugar"
                   name="ubicacion"
@@ -318,6 +407,46 @@ export function EditarPlanPage() {
                   placeholder="Selecciona una categoría"
                   required
                 />
+
+                {/* Cupo máximo por día */}
+                <div className="pt-4 border-t border-cream">
+                  <h4 className="text-sm font-semibold text-primary mb-1">Disponibilidad por fecha</h4>
+                  <FormField
+                    label="Cupo máximo de reservas por día"
+                    name="cupoMaximoDiario"
+                    type="number"
+                    value={formData.cupoMaximoDiario}
+                    onChange={handleChange}
+                    placeholder="Sin límite"
+                  />
+                  <p className="text-xs text-slate mt-1">
+                    Máximo de reservas permitidas para una misma fecha. Deja vacío para sin límite.
+                  </p>
+                </div>
+
+                {/* Contacto del plan */}
+                <div className="pt-4 border-t border-cream">
+                  <h4 className="text-sm font-semibold text-primary mb-1">Contacto para reservantes <span className="text-danger">*</span></h4>
+                  <p className="text-xs text-slate mb-3">Solo visible para quienes completen una reserva.</p>
+                  <FormField
+                    label="Celular de contacto"
+                    name="contactoCelular"
+                    value={formData.contactoCelular}
+                    onChange={handleChange}
+                    placeholder="Ej: +57 300 123 4567"
+                    required
+                  />
+                  <FormField
+                    label="Correo de contacto"
+                    name="contactoEmail"
+                    type="email"
+                    value={formData.contactoEmail}
+                    onChange={handleChange}
+                    placeholder="Ej: reservas@empresa.com"
+                    required
+                    className="mt-3"
+                  />
+                </div>
 
                 {/* Accesibilidad */}
                 <div className="pt-4 border-t border-cream">
