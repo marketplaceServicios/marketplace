@@ -120,7 +120,7 @@ export function LoginPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -128,9 +128,6 @@ export function LoginPage() {
                   />
                   <span className="text-slate">Recordarme</span>
                 </label>
-                <a href="#" className="text-accent hover:underline">
-                  ¿Olvidaste tu contraseña? Te ayudamos a recuperarla.
-                </a>
               </div>
 
               <Button type="submit" className="w-full" size="lg">

@@ -24,7 +24,6 @@ const menuItems = [
   { path: '/', icon: Home, label: 'Dashboard' },
   { path: '/empresas-por-servicios', icon: Building2, label: 'Proveedores' },
   { path: '/usuarios-registrados', icon: Users, label: 'Usuarios registrados' },
-  { path: '/crear-empresa', icon: Plus, label: 'Crear empresa' },
   { path: '/categorias', icon: Tag, label: 'Categorías' },
   { path: '/planes-admin', icon: FileText, label: 'Planes' },
   { path: '/cotizaciones', icon: MessageSquare, label: 'Cotizaciones' },

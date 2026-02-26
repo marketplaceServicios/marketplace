@@ -50,4 +50,18 @@ router.patch('/planes/:id/toggle', adminController.togglePlan)
 router.patch('/planes/:id/destacado', adminController.toggleDestacado)
 router.patch('/planes/:id/oferta', adminController.toggleEsOferta)
 
+// Gestión de administradores
+router.get('/admins', adminController.getAdmins)
+router.post('/admins', adminController.createAdmin)
+router.put('/admins/:id', adminController.updateAdmin)
+
+// Gestión de clientes
+router.patch('/usuarios/:id/toggle', adminController.toggleUsuario)
+
+// Gestión de equipo (desde admin)
+router.get('/equipo', adminController.getAllEquipo)
+router.post('/equipo', adminController.createEquipoAdmin)
+router.put('/equipo/:id', adminController.updateEquipoAdmin)
+router.delete('/equipo/:id', adminController.deleteEquipoAdmin)
+
 module.exports = router
