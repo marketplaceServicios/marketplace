@@ -33,14 +33,28 @@ function buildCheckoutUrl({ reference, amountCents, currency, email, redirectUrl
 
 /**
  * Verifica la firma del webhook de Wompi.
+ * Algoritmo: SHA256(valor1 + valor2 + ... + timestamp + WOMPI_EVENTS_SECRET)
+ * Donde los valores son los de event.signature.properties sobre event.data.transaction
  * Docs: https://docs.wompi.co/docs/en/events
  */
-function verifyWebhookSignature(eventId, timestamp, checksum) {
+function verifyWebhookSignature(event, checksum) {
   const eventsSecret = process.env.WOMPI_EVENTS_SECRET || ''
-  const hash = crypto
-    .createHash('sha256')
-    .update(`${eventId}${timestamp}${eventsSecret}`)
-    .digest('hex')
+  if (!eventsSecret) return true // sin secret configurado, omitir verificación
+
+  const properties = event?.signature?.properties || []
+  const transaction = event?.data?.transaction || {}
+  const timestamp = event?.timestamp
+
+  if (!timestamp) return false
+
+  const propertyValues = properties.map((prop) => {
+    // prop es "transaction.id", "transaction.status", etc.
+    const keys = prop.split('.').slice(1) // quita "transaction."
+    return keys.reduce((obj, key) => (obj != null ? obj[key] : ''), transaction) ?? ''
+  })
+
+  const concatenated = propertyValues.join('') + timestamp + eventsSecret
+  const hash = crypto.createHash('sha256').update(concatenated).digest('hex')
   return hash === checksum
 }
 
