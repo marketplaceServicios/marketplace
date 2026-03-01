@@ -11,6 +11,7 @@ router.get('/', verifyToken, isAdmin, proveedorController.getAll)
 router.post('/', verifyToken, isAdmin, proveedorController.create)
 router.put('/:id', verifyToken, isAdmin, proveedorController.update)
 router.patch('/:id/password', verifyToken, isAdmin, proveedorController.changePassword)
+router.post('/:id/reset-password', verifyToken, isAdmin, proveedorController.resetPasswordAdmin)
 router.patch('/:id/toggle-active', verifyToken, isAdmin, proveedorController.toggleActive)
 router.delete('/:id', verifyToken, isAdmin, proveedorController.deleteProveedor)
 

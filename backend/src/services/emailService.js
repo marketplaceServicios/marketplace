@@ -94,4 +94,59 @@ async function sendWelcomeProveedorEmail({ email, nombreEmpresa, password }) {
   })
 }
 
-module.exports = { sendWelcomeProveedorEmail }
+async function sendPasswordResetEmail({ email, nombreEmpresa, resetUrl }) {
+  const html = `
+    <!DOCTYPE html>
+    <html lang="es">
+    <body style="font-family: Georgia, serif; background: #f5f0eb; margin: 0; padding: 32px;">
+      <div style="max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.08);">
+        <div style="background: #3D4A3A; padding: 32px; text-align: center;">
+          <h1 style="color: #ffffff; margin: 0; font-size: 26px; letter-spacing: 1px;">Vive Silver</h1>
+          <p style="color: rgba(255,255,255,0.7); margin: 8px 0 0; font-size: 14px;">Panel de Proveedores</p>
+        </div>
+        <div style="padding: 32px;">
+          <h2 style="color: #3D4A3A; margin: 0 0 8px;">Restablece tu contraseña</h2>
+          <p style="color: #6b7280; margin: 0 0 24px;">
+            Hola, <strong>${nombreEmpresa}</strong>. Recibimos una solicitud para restablecer la contraseña de tu cuenta.
+            Si no fuiste tú, puedes ignorar este correo.
+          </p>
+          <div style="text-align: center; margin: 28px 0;">
+            <a href="${resetUrl}" style="display: inline-block; background: #CB7A5B; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: bold;">
+              Restablecer contraseña
+            </a>
+          </div>
+          <p style="color: #9ca3af; font-size: 13px; margin: 0 0 8px;">Este enlace expira en <strong>1 hora</strong>.</p>
+          <p style="color: #aaa; font-size: 12px; margin: 0; word-break: break-all;">
+            Si el botón no funciona, copia este enlace en tu navegador:<br/>
+            <a href="${resetUrl}" style="color: #CB7A5B;">${resetUrl}</a>
+          </p>
+        </div>
+        <div style="padding: 20px 32px; background: #f9f9f7; border-top: 1px solid #e5e0d8; text-align: center;">
+          <p style="margin: 0; color: #9ca3af; font-size: 12px;">Si tienes problemas, contacta a tu administrador Vive Silver.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `
+
+  const transporter = createTransporter()
+
+  if (!transporter) {
+    console.log('\n' + '='.repeat(60))
+    console.log('📧  RESET PASSWORD EMAIL (no SMTP configured — dev mode)')
+    console.log('='.repeat(60))
+    console.log(`  To:    ${email}`)
+    console.log(`  URL:   ${resetUrl}`)
+    console.log('='.repeat(60) + '\n')
+    return
+  }
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || '"Vive Silver" <noreply@vivesilver.com>',
+    to: email,
+    subject: 'Restablece tu contraseña — Vive Silver',
+    html,
+  })
+}
+
+module.exports = { sendWelcomeProveedorEmail, sendPasswordResetEmail }

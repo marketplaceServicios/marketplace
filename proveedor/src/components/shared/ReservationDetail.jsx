@@ -14,6 +14,8 @@ import {
   PhoneCall,
   CreditCard,
   MapPin,
+  Receipt,
+  Building2,
 } from 'lucide-react'
 
 const colorVariants = {
@@ -168,8 +170,6 @@ export function ReservationDetail({
             <InfoRow icon={Mail} label="Correo" value={datosFacturacion.email} />
             <InfoRow icon={Phone} label="Celular" value={phoneDisplay} />
             <InfoRow icon={PhoneCall} label="Contacto alterno" value={datosFacturacion.alternateContact} />
-            <InfoRow icon={Hash} label="Dirección" value={datosFacturacion.address} />
-            <InfoRow icon={Hash} label="Ciudad" value={datosFacturacion.city} />
             {datosFacturacion.specialNeeds && (
               <div className="mt-1 p-2.5 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-xs font-semibold text-amber-700 mb-1">Necesidades especiales</p>
@@ -178,6 +178,40 @@ export function ReservationDetail({
             )}
           </div>
         </div>
+
+        {/* Datos para factura electrónica */}
+        {(datosFacturacion.titularNombre || datosFacturacion.address) && (
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Receipt className="h-3.5 w-3.5 text-slate" />
+              <p className="text-xs font-semibold text-slate uppercase tracking-wide">
+                Datos para factura electrónica
+              </p>
+            </div>
+            <div className="p-3 bg-blue-50/60 border border-blue-100 rounded-lg space-y-2.5">
+              <InfoRow icon={User} label="Titular de la factura" value={datosFacturacion.titularNombre} />
+              {(() => {
+                const tipo = DOC_LABELS[datosFacturacion.titularDocTipo] || datosFacturacion.titularDocTipo || ''
+                const display = tipo && datosFacturacion.titularDocNum
+                  ? `${tipo} ${datosFacturacion.titularDocNum}`
+                  : datosFacturacion.titularDocNum || null
+                return <InfoRow icon={CreditCard} label="Documento titular" value={display} />
+              })()}
+              <InfoRow icon={Mail} label="Correo para factura" value={datosFacturacion.titularEmail} />
+              <InfoRow icon={Hash} label="Dirección fiscal" value={datosFacturacion.address} />
+              <InfoRow icon={MapPin} label="Ciudad" value={datosFacturacion.city} />
+              <InfoRow icon={Hash} label="Departamento" value={datosFacturacion.departamento} />
+              <InfoRow icon={Phone} label="Celular" value={datosFacturacion.phone} />
+              {(datosFacturacion.nit || datosFacturacion.companyName) && (
+                <div className="pt-2 border-t border-blue-100 space-y-2">
+                  <p className="text-xs font-medium text-blue-700">Facturación empresarial</p>
+                  <InfoRow icon={Building2} label="NIT empresa" value={datosFacturacion.nit} />
+                  <InfoRow icon={Building2} label="Razón social" value={datosFacturacion.companyName} />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Datos de turistas */}
         {turistas.length > 0 && (

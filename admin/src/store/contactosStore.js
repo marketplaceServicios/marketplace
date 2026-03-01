@@ -12,6 +12,7 @@ const mapContacto = (c) => ({
   nombre: c.nombre,
   email: c.email,
   celular: c.celular,
+  celularAdicional: c.celularAdicional || null,
   mensaje: c.mensaje,
   preferencia: PREFERENCIAS[c.preferenciaContacto] || c.preferenciaContacto,
   leido: c.leido,

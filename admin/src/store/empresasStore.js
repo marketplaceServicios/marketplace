@@ -112,6 +112,11 @@ export const useEmpresasStore = create((set, get) => ({
     }))
   },
 
+  resetPasswordProveedor: async (id) => {
+    const result = await api.post(`/proveedores/${id}/reset-password`)
+    return result.tempPassword
+  },
+
   getUsuariosByEmpresa: (empresaId) => {
     const { usuarios } = get()
     if (!empresaId) return usuarios

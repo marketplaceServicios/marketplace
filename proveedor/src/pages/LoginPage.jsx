@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -133,6 +133,15 @@ export function LoginPage() {
               <Button type="submit" className="w-full" size="lg">
                 Ingresar
               </Button>
+
+              <div className="text-center pt-1">
+                <Link
+                  to="/recuperar-contrasena"
+                  className="text-sm text-slate hover:text-primary transition-colors"
+                >
+                  ¿Olvidaste tu contraseña? Te ayudamos a recuperarla
+                </Link>
+              </div>
             </form>
           </CardContent>
         </Card>

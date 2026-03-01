@@ -39,10 +39,12 @@ model Proveedor {
   logo          String?
   descripcion   String?  @db.Text
   representante Json?
-  activo              Boolean  @default(true)
-  mustChangePassword  Boolean  @default(false)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  activo              Boolean   @default(true)
+  mustChangePassword  Boolean   @default(false)
+  resetToken          String?
+  resetTokenExpiry    DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 
   admin        Admin        @relation(fields: [adminId], references: [id])
   categorias   Categoria[]
@@ -201,6 +203,7 @@ model Contacto {
   nombre              String
   email               String
   celular             String
+  celularAdicional    String?
   mensaje             String   @db.Text
   preferenciaContacto String   @default("whatsapp")
   leido               Boolean  @default(false)

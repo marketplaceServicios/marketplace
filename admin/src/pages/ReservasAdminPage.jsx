@@ -3,7 +3,8 @@ import { api } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   User, Users, Mail, Phone, PhoneCall, CreditCard,
-  Calendar, Package, DollarSign, ChevronDown, ChevronUp, Hash, MapPin
+  Calendar, Package, DollarSign, ChevronDown, ChevronUp, Hash, MapPin,
+  Receipt, Building2
 } from 'lucide-react'
 
 const ESTADO_COLORS = {
@@ -139,8 +140,6 @@ function ReservaRow({ reserva }) {
             <InfoRow icon={Mail} label="Correo" value={df.email} />
             <InfoRow icon={Phone} label="Celular" value={phoneDisplay} />
             <InfoRow icon={PhoneCall} label="Contacto alterno" value={df.alternateContact} />
-            <InfoRow icon={Hash} label="Dirección" value={df.address} />
-            <InfoRow icon={Hash} label="Ciudad" value={df.city} />
             {df.specialNeeds && (
               <div className="mt-1 p-2.5 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-xs font-semibold text-amber-700 mb-1">Necesidades especiales</p>
@@ -148,6 +147,31 @@ function ReservaRow({ reserva }) {
               </div>
             )}
           </div>
+
+          {/* Datos para factura electrónica */}
+          {(df.titularNombre || df.address) && (
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-2 mb-2">
+                <Receipt className="w-3.5 h-3.5 text-muted" />
+                <p className="text-xs font-semibold text-muted uppercase tracking-wide">Datos para factura electrónica</p>
+              </div>
+              <div className="p-3 bg-blue-50/60 border border-blue-100 rounded-lg grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2.5">
+                <InfoRow icon={User} label="Titular de la factura" value={df.titularNombre} />
+                <InfoRow icon={CreditCard} label="Documento titular"
+                  value={(() => {
+                    const tipo = DOC_LABELS[df.titularDocTipo] || df.titularDocTipo || ''
+                    return tipo && df.titularDocNum ? `${tipo} ${df.titularDocNum}` : df.titularDocNum || null
+                  })()} />
+                <InfoRow icon={Mail} label="Correo para factura" value={df.titularEmail} />
+                <InfoRow icon={Hash} label="Dirección fiscal" value={df.address} />
+                <InfoRow icon={MapPin} label="Ciudad" value={df.city} />
+                <InfoRow icon={Hash} label="Departamento" value={df.departamento} />
+                <InfoRow icon={Phone} label="Celular" value={df.phone} />
+                {df.nit && <InfoRow icon={Building2} label="NIT empresa" value={df.nit} />}
+                {df.companyName && <InfoRow icon={Building2} label="Razón social" value={df.companyName} />}
+              </div>
+            </div>
+          )}
 
           {/* Turistas */}
           {turistas.length > 0 && (

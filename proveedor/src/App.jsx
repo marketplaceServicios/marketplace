@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { MainLayout } from './components/layout/MainLayout'
 import { LoginPage } from './pages/LoginPage'
 import { CambiarContrasenaPage } from './pages/CambiarContrasenaPage'
+import { RecuperarContrasenaPage } from './pages/RecuperarContrasenaPage'
+import { NuevaContrasenaPage } from './pages/NuevaContrasenaPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { PlanesPage } from './pages/PlanesPage'
 import { CrearPlanPage } from './pages/CrearPlanPage'
@@ -34,6 +36,10 @@ function App() {
           path="/login"
           element={isAuthenticated ? <Navigate to={mustChange ? '/cambiar-contrasena' : '/'} replace /> : <LoginPage />}
         />
+        {/* Recuperación de contraseña — rutas públicas */}
+        <Route path="/recuperar-contrasena" element={<RecuperarContrasenaPage />} />
+        <Route path="/nueva-contrasena" element={<NuevaContrasenaPage />} />
+
         {/* Pantalla obligatoria de cambio de contraseña */}
         <Route
           path="/cambiar-contrasena"

@@ -14,6 +14,10 @@ router.post('/usuario/register', authController.registerUsuario)
 // Cambiar contraseña en primer acceso (proveedor)
 router.post('/proveedor/change-password', verifyToken, authController.changeProveedorPassword)
 
+// Recuperar contraseña (proveedor) — sin auth
+router.post('/proveedor/solicitar-reset', authController.solicitarResetProveedor)
+router.post('/proveedor/reset-password', authController.resetPasswordProveedor)
+
 // Perfil (requiere autenticación)
 router.get('/profile', verifyToken, authController.getProfile)
 
