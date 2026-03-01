@@ -120,7 +120,10 @@ export function CrearPlanPage() {
         datoClave: formData.accesibilidad ? `Accesibilidad ${formData.accesibilidad}` : '',
         notasAccesibilidad: formData.notasAccesibilidad,
         politicasCancelacion: formData.politicasCancelacion,
-        imagenes: fotos.map((f) => f.url),
+        imagenes: [
+          ...fotos.filter((f) => f.isPrincipal),
+          ...fotos.filter((f) => !f.isPrincipal),
+        ].map((f) => f.url),
         incluye: servicios.filter((s) => s.trim()),
         amenidades,
         disponibilidad,
