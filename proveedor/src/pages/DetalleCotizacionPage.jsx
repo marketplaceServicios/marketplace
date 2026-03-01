@@ -9,8 +9,6 @@ import {
   ArrowLeft,
   User,
   FileText,
-  Phone,
-  Mail,
   CheckCircle,
   RotateCcw,
   StickyNote,
@@ -206,48 +204,22 @@ export function DetalleCotizacionPage() {
           </div>
         </div>
 
-        {/* Contact Sidebar */}
+        {/* Sidebar */}
         <div className="space-y-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-sage/10 rounded-lg">
-                  <Phone className="h-5 w-5 text-sage" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate">Teléfono</p>
-                  <p className="font-medium text-primary">
-                    {cotizacion.telefono}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-accent/10 rounded-lg">
-                  <Mail className="h-5 w-5 text-accent" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate">Correo</p>
-                  <p className="font-medium text-primary">
-                    {cotizacion.email}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="text-center text-sm text-slate space-y-1">
-            <p>Creada: {cotizacion.fechaCreacion}</p>
-            {cotizacion.fechaRespuesta && (
-              <p className={cotizacion.resuelta ? 'text-sage' : 'text-amber-600'}>
-                {cotizacion.resuelta ? 'Respondida el:' : 'Pendiente desde el:'} {cotizacion.fechaRespuesta}
+          <Card className="bg-cream/30 border-dashed">
+            <CardContent className="p-4 text-center space-y-1">
+              <p className="text-xs font-semibold text-slate uppercase tracking-wide">Estado</p>
+              <p className={`text-sm font-medium ${cotizacion.resuelta ? 'text-sage' : 'text-amber-600'}`}>
+                {cotizacion.resuelta ? 'Respondida' : 'Pendiente de respuesta'}
               </p>
-            )}
-          </div>
+              <p className="text-xs text-slate pt-1">Creada: {cotizacion.fechaCreacion}</p>
+              {cotizacion.fechaRespuesta && (
+                <p className={`text-xs ${cotizacion.resuelta ? 'text-sage' : 'text-amber-600'}`}>
+                  {cotizacion.resuelta ? 'Respondida el:' : 'Pendiente desde el:'} {cotizacion.fechaRespuesta}
+                </p>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

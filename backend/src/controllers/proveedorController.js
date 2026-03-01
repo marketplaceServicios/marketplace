@@ -194,6 +194,41 @@ const changePassword = async (req, res) => {
   }
 }
 
+// Reset de contraseña por el admin — genera clave temporal y la devuelve en texto plano
+const resetPasswordAdmin = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const proveedor = await prisma.proveedor.findUnique({ where: { id: parseInt(id) } })
+    if (!proveedor) return res.status(404).json({ error: 'Proveedor no encontrado' })
+
+    // Generar contraseña temporal legible (fácil de dictar por WhatsApp/teléfono)
+    const letras = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz'
+    const nums = '23456789'
+    let temp = 'Tmp-'
+    for (let i = 0; i < 4; i++) temp += letras[Math.floor(Math.random() * letras.length)]
+    temp += '-'
+    for (let i = 0; i < 4; i++) temp += nums[Math.floor(Math.random() * nums.length)]
+
+    const hashedPassword = await bcrypt.hash(temp, 10)
+
+    await prisma.proveedor.update({
+      where: { id: parseInt(id) },
+      data: {
+        password: hashedPassword,
+        mustChangePassword: true,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    })
+
+    res.json({ message: 'Contraseña restablecida', tempPassword: temp })
+  } catch (error) {
+    console.error('Error en resetPasswordAdmin proveedor:', error)
+    res.status(500).json({ error: 'Error al restablecer contraseña' })
+  }
+}
+
 // Eliminar proveedor — desactiva sus planes (no los borra), limpia el resto
 const deleteProveedor = async (req, res) => {
   try {
@@ -269,6 +304,7 @@ module.exports = {
   create,
   update,
   changePassword,
+  resetPasswordAdmin,
   toggleActive,
   deleteProveedor
 }

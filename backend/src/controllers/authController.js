@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 const prisma = require('../config/database')
+const { sendPasswordResetEmail } = require('../services/emailService')
 
 // Generar token JWT
 const generateToken = (user, role) => {
@@ -253,11 +255,94 @@ const getProfile = async (req, res) => {
   }
 }
 
+// Solicitar reset de contraseña (proveedor)
+const solicitarResetProveedor = async (req, res) => {
+  try {
+    const { email } = req.body
+    if (!email) return res.status(400).json({ error: 'El correo es requerido' })
+
+    // Siempre responder igual para no revelar si el email existe
+    const proveedor = await prisma.proveedor.findUnique({ where: { email } })
+    if (proveedor && proveedor.activo) {
+      const rawToken = crypto.randomBytes(32).toString('hex')
+      const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex')
+      const expiry = new Date(Date.now() + 60 * 60 * 1000) // 1 hora
+
+      await prisma.proveedor.update({
+        where: { id: proveedor.id },
+        data: { resetToken: tokenHash, resetTokenExpiry: expiry },
+      })
+
+      const proveedorUrl = process.env.PROVEEDOR_URL || 'http://localhost:5174'
+      const resetUrl = `${proveedorUrl}/nueva-contrasena?token=${rawToken}`
+
+      await sendPasswordResetEmail({
+        email: proveedor.email,
+        nombreEmpresa: proveedor.nombreEmpresa,
+        resetUrl,
+      })
+    }
+
+    res.json({ message: 'Si ese correo está registrado recibirás un enlace en tu bandeja de entrada.' })
+  } catch (error) {
+    console.error('Error en solicitarResetProveedor:', error)
+    res.status(500).json({ error: 'Error al procesar la solicitud' })
+  }
+}
+
+// Restablecer contraseña con token (proveedor)
+const resetPasswordProveedor = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token y nueva contraseña son requeridos' })
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' })
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
+
+    const proveedor = await prisma.proveedor.findFirst({
+      where: {
+        resetToken: tokenHash,
+        resetTokenExpiry: { gt: new Date() },
+        activo: true,
+      },
+    })
+
+    if (!proveedor) {
+      return res.status(400).json({ error: 'El enlace no es válido o ha expirado. Solicita uno nuevo.' })
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10)
+
+    await prisma.proveedor.update({
+      where: { id: proveedor.id },
+      data: {
+        password: hashedPassword,
+        mustChangePassword: false,
+        resetToken: null,
+        resetTokenExpiry: null,
+      },
+    })
+
+    res.json({ message: 'Contraseña actualizada exitosamente. Ya puedes iniciar sesión.' })
+  } catch (error) {
+    console.error('Error en resetPasswordProveedor:', error)
+    res.status(500).json({ error: 'Error al restablecer la contraseña' })
+  }
+}
+
 module.exports = {
   loginAdmin,
   loginProveedor,
   loginUsuario,
   registerUsuario,
   getProfile,
-  changeProveedorPassword
+  changeProveedorPassword,
+  solicitarResetProveedor,
+  resetPasswordProveedor,
 }

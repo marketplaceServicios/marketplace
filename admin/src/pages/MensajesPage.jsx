@@ -103,6 +103,13 @@ export function MensajesPage() {
                       <Phone className="h-3.5 w-3.5 text-sage" />
                       {c.celular}
                     </span>
+                    {c.celularAdicional && (
+                      <span className="flex items-center gap-1.5">
+                        <Phone className="h-3.5 w-3.5 text-slate/60" />
+                        {c.celularAdicional}
+                        <span className="text-xs text-slate/60">(adicional)</span>
+                      </span>
+                    )}
                   </div>
                 </div>
 

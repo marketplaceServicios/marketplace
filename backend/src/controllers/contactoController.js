@@ -3,7 +3,7 @@ const prisma = require('../config/database')
 // Crear mensaje desde la web pública (sin auth)
 const create = async (req, res) => {
   try {
-    const { nombre, email, celular, mensaje, preferenciaContacto } = req.body
+    const { nombre, email, celular, celularAdicional, mensaje, preferenciaContacto } = req.body
 
     if (!nombre || !email || !celular || !mensaje) {
       return res.status(400).json({ error: 'Nombre, email, celular y mensaje son requeridos' })
@@ -14,6 +14,7 @@ const create = async (req, res) => {
         nombre,
         email,
         celular,
+        celularAdicional: celularAdicional || null,
         mensaje,
         preferenciaContacto: preferenciaContacto || 'whatsapp',
       }
