@@ -7,19 +7,7 @@ const wompiWebhook = async (req, res) => {
     const checksum = req.headers['x-event-checksum']
     const event = req.body
 
-    console.log('[Wompi webhook] evento recibido:', JSON.stringify({
-      id: event?.id,
-      event: event?.event,
-      timestamp: event?.timestamp,
-      environment: event?.environment,
-      status: event?.data?.transaction?.status,
-      reference: event?.data?.transaction?.reference,
-      checksumHeader: checksum,
-      signatureProps: event?.signature?.properties,
-    }))
-
     if (!event || !event.data || !event.data.transaction) {
-      console.log('[Wompi webhook] evento sin transaction, ignorando')
       return res.status(200).json({ received: true })
     }
 

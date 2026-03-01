@@ -13,6 +13,7 @@ import {
   Hash,
   PhoneCall,
   CreditCard,
+  MapPin,
 } from 'lucide-react'
 
 const colorVariants = {
@@ -198,6 +199,7 @@ export function ReservationDetail({
                         value={`${new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${t.birthDate}T12:00:00Z`))} · ${calcAge(t.birthDate)} años`}
                       />
                     )}
+                    <InfoRow icon={MapPin} label="Ciudad" value={t.city} />
                   </div>
                 )
               })}

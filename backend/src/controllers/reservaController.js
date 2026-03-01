@@ -29,19 +29,23 @@ const create = async (req, res) => {
       return res.status(404).json({ error: 'Plan no encontrado' })
     }
 
-    // Verificar cupo máximo por día si está configurado
+    // Verificar cupo máximo por día (en personas, no en reservas)
     const selectedDate = datosFacturacion?.selectedDate
     if (plan.cupoMaximoDiario && selectedDate) {
       const result = await prisma.$queryRaw`
-        SELECT COUNT(*) as cnt FROM reservas
+        SELECT COALESCE(SUM(numPersonas), 0) AS personasReservadas FROM reservas
         WHERE planId = ${parseInt(planId)}
         AND JSON_UNQUOTE(JSON_EXTRACT(datosFacturacion, '$.selectedDate')) = ${selectedDate}
         AND estado NOT IN ('cancelada')
       `
-      const ocupadas = Number(result[0]?.cnt || 0)
-      if (ocupadas >= plan.cupoMaximoDiario) {
+      const personasReservadas = Number(result[0]?.personasReservadas || 0)
+      const cuposDisponibles = Math.max(0, plan.cupoMaximoDiario - personasReservadas)
+      if (personasReservadas + numPersonas > plan.cupoMaximoDiario) {
         return res.status(409).json({
-          error: `No hay disponibilidad para esta fecha. Este plan permite máximo ${plan.cupoMaximoDiario} reserva${plan.cupoMaximoDiario !== 1 ? 's' : ''} por día.`
+          error: cuposDisponibles === 0
+            ? 'Esta fecha ya no tiene cupos disponibles.'
+            : `Para esta fecha solo ${cuposDisponibles === 1 ? 'queda' : 'quedan'} ${cuposDisponibles} cupo${cuposDisponibles !== 1 ? 's' : ''} disponible${cuposDisponibles !== 1 ? 's' : ''}.`,
+          cuposDisponibles,
         })
       }
     }

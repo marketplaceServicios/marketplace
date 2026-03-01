@@ -368,6 +368,7 @@ const remove = async (req, res) => {
 }
 
 // Obtener fechas con cupo lleno para un plan (público)
+// Cuenta personas totales (SUM numPersonas), no número de reservas
 const getFechasLlenas = async (req, res) => {
   try {
     const { id } = req.params
@@ -381,19 +382,56 @@ const getFechasLlenas = async (req, res) => {
     const result = await prisma.$queryRaw`
       SELECT
         JSON_UNQUOTE(JSON_EXTRACT(datosFacturacion, '$.selectedDate')) AS fecha,
-        COUNT(*) AS cnt
+        SUM(numPersonas) AS personas
       FROM reservas
       WHERE planId = ${parseInt(id)}
         AND estado NOT IN ('cancelada')
         AND JSON_EXTRACT(datosFacturacion, '$.selectedDate') IS NOT NULL
       GROUP BY fecha
-      HAVING cnt >= ${plan.cupoMaximoDiario}
+      HAVING personas >= ${plan.cupoMaximoDiario}
     `
 
     res.json(result.map((r) => r.fecha).filter(Boolean))
   } catch (error) {
     console.error('Error en getFechasLlenas:', error)
     res.status(500).json({ error: 'Error al obtener fechas' })
+  }
+}
+
+// Cupos disponibles para una fecha específica (público)
+// GET /planes/:id/cupos?fecha=YYYY-MM-DD
+const getCuposDisponibles = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { fecha } = req.query
+
+    const plan = await prisma.plan.findUnique({
+      where: { id: parseInt(id), activo: true },
+      select: { cupoMaximoDiario: true }
+    })
+
+    if (!plan) return res.status(404).json({ error: 'Plan no encontrado' })
+
+    // Sin cupo configurado → sin límite
+    if (!plan.cupoMaximoDiario || !fecha) {
+      return res.json({ cupoMaximo: null, personasReservadas: 0, cuposDisponibles: null })
+    }
+
+    const result = await prisma.$queryRaw`
+      SELECT COALESCE(SUM(numPersonas), 0) AS personasReservadas
+      FROM reservas
+      WHERE planId = ${parseInt(id)}
+        AND JSON_UNQUOTE(JSON_EXTRACT(datosFacturacion, '$.selectedDate')) = ${fecha}
+        AND estado NOT IN ('cancelada')
+    `
+
+    const personasReservadas = Number(result[0]?.personasReservadas || 0)
+    const cuposDisponibles = Math.max(0, plan.cupoMaximoDiario - personasReservadas)
+
+    res.json({ cupoMaximo: plan.cupoMaximoDiario, personasReservadas, cuposDisponibles })
+  } catch (error) {
+    console.error('Error en getCuposDisponibles:', error)
+    res.status(500).json({ error: 'Error al obtener cupos' })
   }
 }
 
@@ -406,5 +444,6 @@ module.exports = {
   create,
   update,
   remove,
-  getFechasLlenas
+  getFechasLlenas,
+  getCuposDisponibles,
 }

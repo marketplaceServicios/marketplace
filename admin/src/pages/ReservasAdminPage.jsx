@@ -3,7 +3,7 @@ import { api } from '@/lib/api'
 import { Card, CardContent } from '@/components/ui/card'
 import {
   User, Users, Mail, Phone, PhoneCall, CreditCard,
-  Calendar, Package, DollarSign, ChevronDown, ChevronUp, Hash
+  Calendar, Package, DollarSign, ChevronDown, ChevronUp, Hash, MapPin
 } from 'lucide-react'
 
 const ESTADO_COLORS = {
@@ -166,6 +166,7 @@ function ReservaRow({ reserva }) {
                         value={`${new Intl.DateTimeFormat('es-CO', { day: '2-digit', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${t.birthDate}T12:00:00Z`))} · ${calcAge(t.birthDate)} años`}
                       />
                     )}
+                    <InfoRow icon={MapPin} label="Ciudad de residencia" value={t.city} />
                   </div>
                 ))}
               </div>
