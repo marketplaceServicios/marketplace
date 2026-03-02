@@ -1,10 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const planController = require('../controllers/planController')
+const fechaBloqueadaController = require('../controllers/fechaBloqueadaController')
 const { verifyToken, isProveedor } = require('../middlewares/auth')
 
 // Rutas protegidas (proveedor) — deben ir antes de /:id
 router.get('/mis/planes', verifyToken, isProveedor, planController.getMyPlanes)
+router.get('/mis/fechas-bloqueadas', verifyToken, isProveedor, fechaBloqueadaController.getFechasBloqueadas)
+router.post('/mis/fechas-bloqueadas', verifyToken, isProveedor, fechaBloqueadaController.bloquearFecha)
+router.delete('/mis/fechas-bloqueadas/:planId/:fecha', verifyToken, isProveedor, fechaBloqueadaController.desbloquearFecha)
 
 // Rutas públicas
 router.get('/', planController.getAll)

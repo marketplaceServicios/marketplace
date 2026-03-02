@@ -3,6 +3,13 @@ import { api } from '@/lib/api'
 
 const COLORS = ['teal', 'green', 'blue', 'amber', 'purple', 'pink']
 
+const buildDateStr = (date) => {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
+}
+
 const mapReserva = (r, i) => {
   const df = r.datosFacturacion || {}
   return {
@@ -67,13 +74,33 @@ export const useReservasStore = create((set, get) => ({
     }))
   },
 
-  bloquearFecha: (date) => {
-    const y = date.getFullYear()
-    const m = String(date.getMonth() + 1).padStart(2, '0')
-    const d = String(date.getDate()).padStart(2, '0')
-    const dateStr = `${y}-${m}-${d}`
+  fetchFechasBloqueadas: async () => {
+    try {
+      // Retorna [{ planId, planTitulo, fecha }, ...]
+      const data = await api.get('/planes/mis/fechas-bloqueadas')
+      set({ fechasBloqueadas: data })
+    } catch (err) {
+      console.error('Error al cargar fechas bloqueadas:', err)
+    }
+  },
+
+  // planIds: array de IDs de planes a bloquear para esa fecha
+  bloquearFecha: async (date, planIds) => {
+    const dateStr = buildDateStr(date)
+    await api.post('/planes/mis/fechas-bloqueadas', { fecha: dateStr, planIds })
+    // Recargar para obtener planTitulo actualizado
+    const nuevas = await api.get('/planes/mis/fechas-bloqueadas')
+    set({ fechasBloqueadas: nuevas })
+  },
+
+  // planId: ID del plan específico a desbloquear
+  desbloquearFecha: async (date, planId) => {
+    const dateStr = buildDateStr(date)
+    await api.delete(`/planes/mis/fechas-bloqueadas/${planId}/${dateStr}`)
     set((state) => ({
-      fechasBloqueadas: [...state.fechasBloqueadas, dateStr]
+      fechasBloqueadas: state.fechasBloqueadas.filter(
+        (f) => !(f.planId === planId && f.fecha === dateStr)
+      )
     }))
   },
 }))

@@ -368,7 +368,7 @@ const remove = async (req, res) => {
 }
 
 // Obtener fechas con cupo lleno para un plan (público)
-// Cuenta personas totales (SUM numPersonas), no número de reservas
+// Incluye fechas llenas por cupo Y fechas bloqueadas manualmente para este plan
 const getFechasLlenas = async (req, res) => {
   try {
     const { id } = req.params
@@ -377,21 +377,33 @@ const getFechasLlenas = async (req, res) => {
       select: { cupoMaximoDiario: true }
     })
 
-    if (!plan || !plan.cupoMaximoDiario) return res.json([])
+    if (!plan) return res.json([])
 
-    const result = await prisma.$queryRaw`
-      SELECT
-        JSON_UNQUOTE(JSON_EXTRACT(datosFacturacion, '$.selectedDate')) AS fecha,
-        SUM(numPersonas) AS personas
-      FROM reservas
-      WHERE planId = ${parseInt(id)}
-        AND estado NOT IN ('cancelada')
-        AND JSON_EXTRACT(datosFacturacion, '$.selectedDate') IS NOT NULL
-      GROUP BY fecha
-      HAVING personas >= ${plan.cupoMaximoDiario}
-    `
+    // Fechas llenas por cupo
+    let fechasLlenas = []
+    if (plan.cupoMaximoDiario) {
+      const result = await prisma.$queryRaw`
+        SELECT
+          JSON_UNQUOTE(JSON_EXTRACT(datosFacturacion, '$.selectedDate')) AS fecha,
+          SUM(numPersonas) AS personas
+        FROM reservas
+        WHERE planId = ${parseInt(id)}
+          AND estado NOT IN ('cancelada')
+          AND JSON_EXTRACT(datosFacturacion, '$.selectedDate') IS NOT NULL
+        GROUP BY fecha
+        HAVING personas >= ${plan.cupoMaximoDiario}
+      `
+      fechasLlenas = result.map((r) => r.fecha).filter(Boolean)
+    }
 
-    res.json(result.map((r) => r.fecha).filter(Boolean))
+    // Fechas bloqueadas manualmente para este plan específico
+    const bloqueadas = await prisma.fechaBloqueada.findMany({
+      where: { planId: parseInt(id) },
+      select: { fecha: true }
+    })
+
+    const todas = [...new Set([...fechasLlenas, ...bloqueadas.map((b) => b.fecha)])]
+    res.json(todas)
   } catch (error) {
     console.error('Error en getFechasLlenas:', error)
     res.status(500).json({ error: 'Error al obtener fechas' })

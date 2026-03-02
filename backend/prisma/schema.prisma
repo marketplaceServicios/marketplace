@@ -127,7 +127,8 @@ model Plan {
   categoria    Categoria    @relation(fields: [categoriaId], references: [id])
   reservas     Reserva[]
   cotizaciones Cotizacion[]
-  resenas      Resena[]
+  resenas          Resena[]
+  fechasBloqueadas FechaBloqueada[]
 
   @@map("planes")
 }
@@ -278,4 +279,18 @@ model Experiencia360 {
   updatedAt   DateTime @updatedAt
 
   @@map("experiencias_360")
+}
+
+// ==================== FECHAS BLOQUEADAS ====================
+
+model FechaBloqueada {
+  id        Int      @id @default(autoincrement())
+  planId    Int
+  fecha     String   // YYYY-MM-DD
+  createdAt DateTime @default(now())
+
+  plan      Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, fecha])
+  @@map("fechas_bloqueadas")
 }
