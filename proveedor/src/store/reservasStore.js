@@ -14,6 +14,7 @@ const mapReserva = (r, i) => {
   const df = r.datosFacturacion || {}
   return {
     id: r.id,
+    planId: r.plan?.id || null,
     codigo: r.codigo,
     fecha: df.selectedDate || r.createdAt?.split('T')[0] || '',
     servicio: r.plan?.titulo || '—',

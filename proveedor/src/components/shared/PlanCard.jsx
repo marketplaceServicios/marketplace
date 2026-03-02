@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
-import { Star, Tag, Pencil, EyeOff, Eye, Trash2, Check, X } from 'lucide-react'
+import { Star, Tag, Pencil, EyeOff, Eye, Trash2, Check, X, Users } from 'lucide-react'
 
 export function PlanCard({
   image,
@@ -12,6 +12,7 @@ export function PlanCard({
   category,
   valor,
   precioOriginal,
+  cupoMaximoDiario,
   activo = true,
   isPrincipal = false,
   isOferta = false,
@@ -71,7 +72,7 @@ export function PlanCard({
           <p className="text-sm text-slate mb-2 line-clamp-2">{description}</p>
         )}
         {valor && (
-          <div className="mb-3">
+          <div className="mb-2">
             {precioOriginal && (
               <p className="text-xs text-slate/60 line-through leading-none mb-0.5">
                 {formatPrice(precioOriginal)}
@@ -79,6 +80,12 @@ export function PlanCard({
             )}
             <p className="text-accent font-bold">{formatPrice(valor)}</p>
           </div>
+        )}
+        {cupoMaximoDiario && (
+          <p className="text-xs text-slate/60 flex items-center gap-1 mb-2">
+            <Users className="h-3 w-3" />
+            Cupo: {cupoMaximoDiario} personas/día
+          </p>
         )}
         <div className="flex flex-col gap-2">
           {onEdit && activo && (

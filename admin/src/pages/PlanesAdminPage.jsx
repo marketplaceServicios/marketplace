@@ -128,6 +128,7 @@ export function PlanesAdminPage() {
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted">Proveedor</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted">Categoría</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted">Precio</th>
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted">Cupo/día</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted">Estado</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted">Web</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-muted">Acciones</th>
@@ -140,6 +141,9 @@ export function PlanesAdminPage() {
                     <td className="py-3 px-4 text-sm text-muted">{plan.proveedor?.nombreEmpresa || '—'}</td>
                     <td className="py-3 px-4 text-sm text-muted">{plan.categoria?.nombre || '—'}</td>
                     <td className="py-3 px-4 text-sm text-muted">${Number(plan.precio).toLocaleString('es-CO')}</td>
+                    <td className="py-3 px-4 text-sm text-muted">
+                      {plan.cupoMaximoDiario ? `${plan.cupoMaximoDiario} pers.` : '—'}
+                    </td>
                     <td className="py-3 px-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getBadge(plan.activo)}`}>
                         {plan.activo ? 'Activo' : 'Inactivo'}

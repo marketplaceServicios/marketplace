@@ -76,6 +76,7 @@ export function PlanesPage() {
                     category={plan.categoria}
                     valor={plan.valor}
                     precioOriginal={plan.precioOriginal}
+                    cupoMaximoDiario={plan.cupoMaximoDiario}
                     activo={plan.activo}
                     isPrincipal={plan.isPrincipal}
                     isOferta={plan.isOferta}
@@ -108,6 +109,7 @@ export function PlanesPage() {
                     description={plan.descripcion}
                     category={plan.categoria}
                     valor={plan.valor}
+                    cupoMaximoDiario={plan.cupoMaximoDiario}
                     activo={false}
                     isPrincipal={false}
                     isOferta={false}
