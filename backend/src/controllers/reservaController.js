@@ -29,8 +29,18 @@ const create = async (req, res) => {
       return res.status(404).json({ error: 'Plan no encontrado' })
     }
 
-    // Verificar cupo máximo por día (en personas, no en reservas)
+    // Verificar si la fecha está bloqueada manualmente por el proveedor
     const selectedDate = datosFacturacion?.selectedDate
+    if (selectedDate) {
+      const bloqueada = await prisma.fechaBloqueada.findUnique({
+        where: { planId_fecha: { planId: parseInt(planId), fecha: selectedDate } }
+      })
+      if (bloqueada) {
+        return res.status(409).json({ error: 'El proveedor no tiene disponibilidad para esta fecha.' })
+      }
+    }
+
+    // Verificar cupo máximo por día (en personas, no en reservas)
     if (plan.cupoMaximoDiario && selectedDate) {
       const result = await prisma.$queryRaw`
         SELECT COALESCE(SUM(numPersonas), 0) AS personasReservadas FROM reservas
