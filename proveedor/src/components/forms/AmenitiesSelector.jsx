@@ -1,51 +1,79 @@
+import { useState, useEffect } from 'react'
+import { api } from '@/lib/api'
 import {
   Bus, Utensils, UserCheck, Camera, Home, Sparkles,
   Heart, Wifi, Shield, Coffee, Waves, Car,
   Music, ShoppingBag, Accessibility, Star,
-  Compass, Leaf, BookOpen, Activity
+  Compass, Leaf, BookOpen, Activity,
+  MapPin, Clock, Sun, Wind, Dumbbell, Bike, Baby, Flame, Flower2, Soup,
 } from 'lucide-react'
 
-export const SERVICIOS_DISPONIBLES = [
-  { id: 'transport',      label: 'Transporte',        Icon: Bus },
-  { id: 'food',           label: 'Alimentación',       Icon: Utensils },
-  { id: 'guide',          label: 'Guía turístico',     Icon: UserCheck },
-  { id: 'photos',         label: 'Fotos',              Icon: Camera },
-  { id: 'hotel',          label: 'Alojamiento',        Icon: Home },
-  { id: 'breakfast',      label: 'Desayuno',           Icon: Coffee },
-  { id: 'spa',            label: 'SPA',                Icon: Sparkles },
-  { id: 'pool',           label: 'Piscina',            Icon: Waves },
-  { id: 'medical',        label: 'Asistencia médica',  Icon: Heart },
-  { id: 'insurance',      label: 'Seguro de viaje',    Icon: Shield },
-  { id: 'wifi',           label: 'WiFi',               Icon: Wifi },
-  { id: 'parking',        label: 'Parqueadero',        Icon: Car },
-  { id: 'entertainment',  label: 'Entretenimiento',    Icon: Music },
-  { id: 'shopping',       label: 'Compras',            Icon: ShoppingBag },
-  { id: 'accessibility',  label: 'Silla de ruedas',    Icon: Accessibility },
-  { id: 'tour',           label: 'Recorrido guiado',   Icon: Compass },
-  { id: 'wellness',       label: 'Bienestar',          Icon: Leaf },
-  { id: 'activities',     label: 'Actividades',        Icon: Activity },
-  { id: 'workshop',       label: 'Taller / Clase',     Icon: BookOpen },
-  { id: 'dinner',         label: 'Cena incluida',      Icon: Star },
+const ICON_MAP = {
+  Bus, Utensils, UserCheck, Camera, Home, Sparkles,
+  Heart, Wifi, Shield, Coffee, Waves, Car,
+  Music, ShoppingBag, Accessibility, Star,
+  Compass, Leaf, BookOpen, Activity,
+  MapPin, Clock, Sun, Wind, Dumbbell, Bike, Baby, Flame, Flower2, Soup,
+}
+
+// Lista base hardcodeada — se usa como fallback si la API no devuelve datos
+const SERVICIOS_BASE = [
+  { slug: 'transport',     label: 'Transporte',       icono: 'Bus'           },
+  { slug: 'food',          label: 'Alimentación',      icono: 'Utensils'      },
+  { slug: 'guide',         label: 'Guía turístico',    icono: 'UserCheck'     },
+  { slug: 'photos',        label: 'Fotos',             icono: 'Camera'        },
+  { slug: 'hotel',         label: 'Alojamiento',       icono: 'Home'          },
+  { slug: 'breakfast',     label: 'Desayuno',          icono: 'Coffee'        },
+  { slug: 'spa',           label: 'SPA',               icono: 'Sparkles'      },
+  { slug: 'pool',          label: 'Piscina',           icono: 'Waves'         },
+  { slug: 'medical',       label: 'Asistencia médica', icono: 'Heart'         },
+  { slug: 'insurance',     label: 'Seguro de viaje',   icono: 'Shield'        },
+  { slug: 'wifi',          label: 'WiFi',              icono: 'Wifi'          },
+  { slug: 'parking',       label: 'Parqueadero',       icono: 'Car'           },
+  { slug: 'entertainment', label: 'Entretenimiento',   icono: 'Music'         },
+  { slug: 'shopping',      label: 'Compras',           icono: 'ShoppingBag'   },
+  { slug: 'accessibility', label: 'Silla de ruedas',   icono: 'Accessibility' },
+  { slug: 'tour',          label: 'Recorrido guiado',  icono: 'Compass'       },
+  { slug: 'wellness',      label: 'Bienestar',         icono: 'Leaf'          },
+  { slug: 'activities',    label: 'Actividades',       icono: 'Activity'      },
+  { slug: 'workshop',      label: 'Taller / Clase',    icono: 'BookOpen'      },
+  { slug: 'dinner',        label: 'Cena incluida',     icono: 'Star'          },
 ]
 
 export function AmenitiesSelector({ value = [], onChange }) {
-  const toggle = (id) => {
-    if (value.includes(id)) {
-      onChange(value.filter((v) => v !== id))
+  const [servicios, setServicios] = useState(SERVICIOS_BASE)
+
+  useEffect(() => {
+    api.get('/servicios-incluidos')
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setServicios(data)
+        }
+        // Si la API devuelve vacío o falla, se mantiene SERVICIOS_BASE
+      })
+      .catch(() => {
+        // Silencioso — mantiene la lista base hardcodeada
+      })
+  }, [])
+
+  const toggle = (slug) => {
+    if (value.includes(slug)) {
+      onChange(value.filter((v) => v !== slug))
     } else {
-      onChange([...value, id])
+      onChange([...value, slug])
     }
   }
 
   return (
     <div className="flex flex-wrap gap-2">
-      {SERVICIOS_DISPONIBLES.map(({ id, label, Icon }) => {
-        const selected = value.includes(id)
+      {servicios.map(({ slug, label, icono }) => {
+        const Icon = ICON_MAP[icono] || Star
+        const selected = value.includes(slug)
         return (
           <button
-            key={id}
+            key={slug}
             type="button"
-            onClick={() => toggle(id)}
+            onClick={() => toggle(slug)}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all
               ${selected
                 ? 'bg-sage/15 border-sage text-sage'

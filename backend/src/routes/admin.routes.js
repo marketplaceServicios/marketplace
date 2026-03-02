@@ -6,6 +6,7 @@ const testimonioController = require('../controllers/testimonioController')
 const experiencia360Controller = require('../controllers/experiencia360Controller')
 const enlaceRapidoController = require('../controllers/enlaceRapidoController')
 const reviewController = require('../controllers/reviewController')
+const servicioIncluidoController = require('../controllers/servicioIncluidoController')
 const { verifyToken, isAdmin } = require('../middlewares/auth')
 
 // Todas las rutas requieren ser admin
@@ -70,6 +71,12 @@ router.get('/equipo', adminController.getAllEquipo)
 router.post('/equipo', adminController.createEquipoAdmin)
 router.put('/equipo/:id', adminController.updateEquipoAdmin)
 router.delete('/equipo/:id', adminController.deleteEquipoAdmin)
+
+// Servicios incluidos (para formulario de planes del proveedor)
+router.get('/servicios-incluidos', servicioIncluidoController.getAllAdmin)
+router.post('/servicios-incluidos', servicioIncluidoController.create)
+router.put('/servicios-incluidos/:id', servicioIncluidoController.update)
+router.delete('/servicios-incluidos/:id', servicioIncluidoController.remove)
 
 // Reseñas
 router.get('/resenas', reviewController.getAllAdmin)
