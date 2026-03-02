@@ -5,7 +5,8 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { ReservationDetail } from '@/components/shared/ReservationDetail'
 import { useReservasStore } from '@/store/reservasStore'
 import { usePlanesStore } from '@/store/planesStore'
-import { ChevronLeft, ChevronRight, Calendar, Lock } from 'lucide-react'
+import { api } from '@/lib/api'
+import { ChevronLeft, ChevronRight, Calendar, Lock, Users } from 'lucide-react'
 import {
   format,
   startOfMonth,
@@ -43,6 +44,7 @@ export function ReservasPage() {
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [mostrandoSelector, setMostrandoSelector] = useState(false)
   const [planesSeleccionados, setPlanesSeleccionados] = useState([])
+  const [cuposPorPlan, setCuposPorPlan] = useState([])
 
   const reservas = useReservasStore((state) => state.reservas)
   const fetchReservas = useReservasStore((state) => state.fetchReservas)
@@ -60,10 +62,28 @@ export function ReservasPage() {
   const selectedReservas = selectedDate ? getReservasByDate(selectedDate) : []
   const selectedReserva = selectedReservas[selectedIndex] || null
 
-  const handleSelectDate = (date) => {
+  const handleSelectDate = async (date) => {
     setSelectedDate(date)
     setSelectedIndex(0)
     setMostrandoSelector(false)
+    setCuposPorPlan([])
+
+    const dateStr = format(date, 'yyyy-MM-dd')
+    const reservasDelDia = reservas.filter((r) => r.fecha === dateStr)
+    const planIds = [...new Set(reservasDelDia.filter((r) => r.planId).map((r) => r.planId))]
+    if (planIds.length === 0) return
+
+    const results = await Promise.all(
+      planIds.map(async (planId) => {
+        try {
+          const data = await api.get(`/planes/${planId}/cupos?fecha=${dateStr}`)
+          if (!data.cupoMaximo) return null
+          const titulo = reservasDelDia.find((r) => r.planId === planId)?.servicio || `Plan ${planId}`
+          return { planId, titulo, ...data }
+        } catch { return null }
+      })
+    )
+    setCuposPorPlan(results.filter(Boolean))
   }
 
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1))
@@ -370,6 +390,32 @@ export function ReservasPage() {
                   Bloquear
                 </Button>
               </div>
+
+              {/* Cupos disponibles por plan */}
+              {cuposPorPlan.length > 0 && (
+                <div className="space-y-1.5">
+                  {cuposPorPlan.map((info) => (
+                    <div
+                      key={info.planId}
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium
+                        ${info.cuposDisponibles === 0
+                          ? 'bg-red-50 text-red-700'
+                          : info.cuposDisponibles !== null && info.cuposDisponibles <= 3
+                          ? 'bg-amber-50 text-amber-700'
+                          : 'bg-sage/10 text-sage'
+                        }`}
+                    >
+                      <Users className="h-3.5 w-3.5 flex-shrink-0" />
+                      <span className="truncate flex-1">{info.titulo}</span>
+                      <span className="flex-shrink-0">
+                        {info.cuposDisponibles === 0
+                          ? 'Sin cupos'
+                          : `${info.cuposDisponibles} cupo${info.cuposDisponibles !== 1 ? 's' : ''} libres`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Selector de reserva cuando hay varias */}
               {selectedReservas.length > 1 && (

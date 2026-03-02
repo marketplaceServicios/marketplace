@@ -419,7 +419,7 @@ export function CrearPlanPage() {
                 <div className="pt-4 border-t border-cream">
                   <h4 className="text-sm font-semibold text-primary mb-3">Accesibilidad</h4>
                   <FormSelect
-                    label="Nivel de accesibilidad"
+                    label="Grado de dificultad"
                     name="accesibilidad"
                     value={formData.accesibilidad}
                     onChange={handleAccesibilidadChange}
