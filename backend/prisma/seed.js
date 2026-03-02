@@ -210,6 +210,38 @@ async function main() {
   }
   console.log('✅ Testimonios creados:', testimoniosData.length)
 
+  // Crear Servicios Incluidos
+  const serviciosData = [
+    { slug: 'transport',     label: 'Transporte',        icono: 'Bus',           orden: 0  },
+    { slug: 'food',          label: 'Alimentación',       icono: 'Utensils',      orden: 1  },
+    { slug: 'guide',         label: 'Guía turístico',     icono: 'UserCheck',     orden: 2  },
+    { slug: 'photos',        label: 'Fotos',              icono: 'Camera',        orden: 3  },
+    { slug: 'hotel',         label: 'Alojamiento',        icono: 'Home',          orden: 4  },
+    { slug: 'breakfast',     label: 'Desayuno',           icono: 'Coffee',        orden: 5  },
+    { slug: 'spa',           label: 'SPA',                icono: 'Sparkles',      orden: 6  },
+    { slug: 'pool',          label: 'Piscina',            icono: 'Waves',         orden: 7  },
+    { slug: 'medical',       label: 'Asistencia médica',  icono: 'Heart',         orden: 8  },
+    { slug: 'insurance',     label: 'Seguro de viaje',    icono: 'Shield',        orden: 9  },
+    { slug: 'wifi',          label: 'WiFi',               icono: 'Wifi',          orden: 10 },
+    { slug: 'parking',       label: 'Parqueadero',        icono: 'Car',           orden: 11 },
+    { slug: 'entertainment', label: 'Entretenimiento',    icono: 'Music',         orden: 12 },
+    { slug: 'shopping',      label: 'Compras',            icono: 'ShoppingBag',   orden: 13 },
+    { slug: 'accessibility', label: 'Silla de ruedas',    icono: 'Accessibility', orden: 14 },
+    { slug: 'tour',          label: 'Recorrido guiado',   icono: 'Compass',       orden: 15 },
+    { slug: 'wellness',      label: 'Bienestar',          icono: 'Leaf',          orden: 16 },
+    { slug: 'activities',    label: 'Actividades',        icono: 'Activity',      orden: 17 },
+    { slug: 'workshop',      label: 'Taller / Clase',     icono: 'BookOpen',      orden: 18 },
+    { slug: 'dinner',        label: 'Cena incluida',      icono: 'Star',          orden: 19 },
+  ]
+  for (const s of serviciosData) {
+    await prisma.servicioIncluido.upsert({
+      where: { slug: s.slug },
+      update: { label: s.label, icono: s.icono, orden: s.orden },
+      create: s,
+    })
+  }
+  console.log('✅ Servicios incluidos creados:', serviciosData.length)
+
   console.log('')
   console.log('🎉 Seed completado!')
   console.log('')

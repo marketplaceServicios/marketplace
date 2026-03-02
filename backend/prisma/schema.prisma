@@ -281,6 +281,19 @@ model Experiencia360 {
   @@map("experiencias_360")
 }
 
+// ==================== SERVICIOS INCLUIDOS ====================
+
+model ServicioIncluido {
+  id     Int     @id @default(autoincrement())
+  slug   String  @unique
+  label  String
+  icono  String  // Nombre del componente lucide-react (ej: 'Bus', 'Utensils')
+  activo Boolean @default(true)
+  orden  Int     @default(0)
+
+  @@map("servicios_incluidos")
+}
+
 // ==================== FECHAS BLOQUEADAS ====================
 
 model FechaBloqueada {

@@ -7,7 +7,14 @@ import { useTestimoniosStore } from '@/store/testimoniosStore'
 import { useExperiencias360Store } from '@/store/experiencias360Store'
 import { useEnlacesRapidosStore } from '@/store/enlacesRapidosStore'
 import { api } from '@/lib/api'
-import { FileText, Image, Video, Plus, Edit, Trash2, Star, X, Check, Eye, EyeOff, Save, Loader2, Globe, Link2 } from 'lucide-react'
+import {
+  FileText, Image, Video, Plus, Edit, Trash2, Star, X, Check, Eye, EyeOff, Save, Loader2, Globe, Link2,
+  Bus, Utensils, UserCheck, Camera, Home, Sparkles,
+  Heart, Wifi, Shield, Coffee, Waves, Car,
+  Music, ShoppingBag, Accessibility,
+  Compass, Leaf, BookOpen, Activity,
+  MapPin, Clock, Sun, Wind, Dumbbell, Bike, Baby, Flame, Flower2, Soup,
+} from 'lucide-react'
 
 const mockGuias = [
   { id: 1, titulo: 'Guía de accesibilidad para viajeros Silver', tipo: 'PDF', fecha: '2024-01-10' },
@@ -15,7 +22,48 @@ const mockGuias = [
   { id: 3, titulo: 'Recomendaciones para familias cuidadoras', tipo: 'PDF', fecha: '2024-01-05' },
 ]
 
-const tabs = ['Testimonios', 'Experiencias 360', 'General', 'Guías', 'Recursos']
+const tabs = ['Testimonios', 'Experiencias 360', 'General', 'Servicios', 'Guías', 'Recursos']
+
+const ICON_MAP = {
+  Bus, Utensils, UserCheck, Camera, Home, Sparkles,
+  Heart, Wifi, Shield, Coffee, Waves, Car,
+  Music, ShoppingBag, Accessibility, Star,
+  Compass, Leaf, BookOpen, Activity,
+  MapPin, Clock, Sun, Wind, Dumbbell, Bike, Baby, Flame, Flower2, Soup,
+}
+
+const ICONOS_DISPONIBLES = [
+  { nombre: 'Bus',           label: 'Transporte'    },
+  { nombre: 'Utensils',      label: 'Alimentación'  },
+  { nombre: 'UserCheck',     label: 'Guía'          },
+  { nombre: 'Camera',        label: 'Fotos'         },
+  { nombre: 'Home',          label: 'Alojamiento'   },
+  { nombre: 'Coffee',        label: 'Desayuno'      },
+  { nombre: 'Sparkles',      label: 'SPA'           },
+  { nombre: 'Waves',         label: 'Piscina'       },
+  { nombre: 'Heart',         label: 'Salud'         },
+  { nombre: 'Shield',        label: 'Seguro'        },
+  { nombre: 'Wifi',          label: 'WiFi'          },
+  { nombre: 'Car',           label: 'Auto'          },
+  { nombre: 'Music',         label: 'Música'        },
+  { nombre: 'ShoppingBag',   label: 'Compras'       },
+  { nombre: 'Accessibility', label: 'Accesibilidad' },
+  { nombre: 'Star',          label: 'Destacado'     },
+  { nombre: 'Compass',       label: 'Tour'          },
+  { nombre: 'Leaf',          label: 'Bienestar'     },
+  { nombre: 'BookOpen',      label: 'Taller'        },
+  { nombre: 'Activity',      label: 'Actividades'   },
+  { nombre: 'MapPin',        label: 'Ubicación'     },
+  { nombre: 'Clock',         label: 'Horario'       },
+  { nombre: 'Sun',           label: 'Exterior'      },
+  { nombre: 'Wind',          label: 'Aire libre'    },
+  { nombre: 'Dumbbell',      label: 'Gimnasio'      },
+  { nombre: 'Bike',          label: 'Ciclismo'      },
+  { nombre: 'Baby',          label: 'Niños'         },
+  { nombre: 'Flame',         label: 'Fuego'         },
+  { nombre: 'Flower2',       label: 'Flores'        },
+  { nombre: 'Soup',          label: 'Gastronomía'   },
+]
 
 const emptyForm = { nombre: '', ciudad: '', texto: '', rating: 5, foto: '' }
 const emptyExp360Form = { titulo: '', descripcion: '', iframeSrc: '', thumbnail: '', orden: 0 }
@@ -39,6 +87,15 @@ export function ContenidoPage() {
   const [exp360ThumbFile, setExp360ThumbFile] = useState(null)
   const [editExp360ThumbFile, setEditExp360ThumbFile] = useState(null)
 
+  // Servicios incluidos state
+  const [servicios, setServicios] = useState([])
+  const [loadingServicios, setLoadingServicios] = useState(false)
+  const [showServicioForm, setShowServicioForm] = useState(false)
+  const [servicioForm, setServicioForm] = useState({ label: '', slug: '', icono: 'Star' })
+  const [savingServicio, setSavingServicio] = useState(false)
+  const [editingServicioId, setEditingServicioId] = useState(null)
+  const [editServicioForm, setEditServicioForm] = useState({ label: '', icono: '' })
+
   const { testimonios, loading, fetchTestimonios, createTestimonio, updateTestimonio, deleteTestimonio } = useTestimoniosStore()
   const { experiencias, loading: loadingExp360, fetchExperiencias, createExperiencia, updateExperiencia, deleteExperiencia } = useExperiencias360Store()
   const { enlaces, loading: loadingEnlaces, fetchEnlaces, createEnlace, updateEnlace, deleteEnlace } = useEnlacesRapidosStore()
@@ -49,10 +106,70 @@ export function ContenidoPage() {
   const [editingEnlaceId, setEditingEnlaceId] = useState(null)
   const [editEnlaceForm, setEditEnlaceForm] = useState(emptyEnlaceForm)
 
+  const fetchServicios = async () => {
+    setLoadingServicios(true)
+    try {
+      const data = await api.get('/admin/servicios-incluidos')
+      setServicios(data)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingServicios(false)
+    }
+  }
+
+  const handleCreateServicio = async (e) => {
+    e.preventDefault()
+    if (!servicioForm.label.trim() || !servicioForm.icono) return
+    setSavingServicio(true)
+    try {
+      const slug = servicioForm.slug.trim() ||
+        servicioForm.label.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+      const created = await api.post('/admin/servicios-incluidos', { ...servicioForm, slug })
+      setServicios([...servicios, created])
+      setServicioForm({ label: '', slug: '', icono: 'Star' })
+      setShowServicioForm(false)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setSavingServicio(false)
+    }
+  }
+
+  const handleToggleServicio = async (id, activo) => {
+    try {
+      const updated = await api.put(`/admin/servicios-incluidos/${id}`, { activo: !activo })
+      setServicios(servicios.map((s) => (s.id === id ? updated : s)))
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleSaveEditServicio = async (id) => {
+    try {
+      const updated = await api.put(`/admin/servicios-incluidos/${id}`, editServicioForm)
+      setServicios(servicios.map((s) => (s.id === id ? updated : s)))
+      setEditingServicioId(null)
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const handleDeleteServicio = async (id) => {
+    if (!confirm('¿Eliminar este servicio? Los planes que lo tienen seleccionado mantendrán el valor guardado.')) return
+    try {
+      await api.delete(`/admin/servicios-incluidos/${id}`)
+      setServicios(servicios.filter((s) => s.id !== id))
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
   useEffect(() => {
     fetchTestimonios()
     fetchExperiencias()
     fetchEnlaces()
+    fetchServicios()
   }, [fetchTestimonios, fetchExperiencias, fetchEnlaces])
 
   const uploadFoto = async (file) => {
@@ -763,6 +880,180 @@ export function ContenidoPage() {
           </div>
         )
       })()}
+
+      {activeTab === 'Servicios' && (
+        <div>
+          <div className="flex items-start justify-between mb-4">
+            <p className="text-sm text-muted max-w-lg">
+              Estos son los servicios que los proveedores pueden seleccionar al crear un plan.
+              Aparecen como íconos en la web pública.
+            </p>
+            <Button
+              size="sm"
+              onClick={() => { setShowServicioForm(!showServicioForm); setServicioForm({ label: '', slug: '', icono: 'Star' }) }}
+            >
+              {showServicioForm ? <X size={16} /> : <Plus size={16} />}
+              <span className="ml-2">{showServicioForm ? 'Cancelar' : 'Agregar servicio'}</span>
+            </Button>
+          </div>
+
+          {/* Formulario nuevo servicio */}
+          {showServicioForm && (
+            <form onSubmit={handleCreateServicio} className="bg-white rounded-xl border border-cream shadow-sm p-5 mb-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-primary mb-1 block">Nombre visible *</label>
+                  <Input
+                    value={servicioForm.label}
+                    onChange={(e) => setServicioForm({ ...servicioForm, label: e.target.value })}
+                    placeholder="Ej: Kayak incluido"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-primary mb-1 block">
+                    Slug <span className="text-muted font-normal">(se autogenera si lo dejas vacío)</span>
+                  </label>
+                  <Input
+                    value={servicioForm.slug}
+                    onChange={(e) => setServicioForm({ ...servicioForm, slug: e.target.value })}
+                    placeholder="Ej: kayak"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-primary mb-2 block">Ícono *</label>
+                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto p-1">
+                  {ICONOS_DISPONIBLES.map(({ nombre, label }) => {
+                    const Icon = ICON_MAP[nombre]
+                    return (
+                      <button
+                        key={nombre}
+                        type="button"
+                        onClick={() => setServicioForm({ ...servicioForm, icono: nombre })}
+                        className={`flex flex-col items-center gap-1 p-2 rounded-lg border text-xs transition-all w-16
+                          ${servicioForm.icono === nombre
+                            ? 'border-accent bg-accent/10 text-accent'
+                            : 'border-gray-200 hover:border-accent/40 text-muted'
+                          }`}
+                        title={label}
+                      >
+                        <Icon size={18} />
+                        <span className="truncate w-full text-center leading-tight">{label}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button type="submit" disabled={savingServicio}>
+                  {savingServicio && <Loader2 size={16} className="animate-spin mr-2" />}
+                  <Save size={16} className="mr-2" />
+                  Guardar
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {/* Lista de servicios */}
+          {loadingServicios ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={24} className="animate-spin text-accent" />
+            </div>
+          ) : servicios.length === 0 ? (
+            <div className="text-center py-12 text-muted">No hay servicios. Crea el primero.</div>
+          ) : (
+            <div className="bg-white rounded-xl border border-cream shadow-sm divide-y divide-cream">
+              {servicios.map((s) => {
+                const Icon = ICON_MAP[s.icono] || Star
+                return (
+                  <div key={s.id} className="p-4">
+                    {editingServicioId === s.id ? (
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs font-medium text-primary mb-1 block">Nombre visible</label>
+                            <Input
+                              value={editServicioForm.label}
+                              onChange={(e) => setEditServicioForm({ ...editServicioForm, label: e.target.value })}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-primary mb-1 block">Ícono actual: <strong>{editServicioForm.icono}</strong></label>
+                            <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-1">
+                              {ICONOS_DISPONIBLES.map(({ nombre, label }) => {
+                                const Ic = ICON_MAP[nombre]
+                                return (
+                                  <button
+                                    key={nombre}
+                                    type="button"
+                                    onClick={() => setEditServicioForm({ ...editServicioForm, icono: nombre })}
+                                    className={`flex flex-col items-center gap-0.5 p-1.5 rounded-lg border text-[10px] w-14 transition-all
+                                      ${editServicioForm.icono === nombre
+                                        ? 'border-accent bg-accent/10 text-accent'
+                                        : 'border-gray-200 hover:border-accent/40 text-muted'
+                                      }`}
+                                    title={label}
+                                  >
+                                    <Ic size={16} />
+                                    <span className="truncate w-full text-center leading-tight">{label}</span>
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => setEditingServicioId(null)}>
+                            <X size={14} className="mr-1" /> Cancelar
+                          </Button>
+                          <Button size="sm" onClick={() => handleSaveEditServicio(s.id)}>
+                            <Check size={14} className="mr-1" /> Guardar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3">
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${s.activo ? 'bg-sage/10 text-sage' : 'bg-cream text-muted'}`}>
+                          <Icon size={18} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-primary text-sm">{s.label}</p>
+                          <p className="text-xs text-muted">{s.slug} · {s.icono}</p>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${s.activo ? 'bg-sage/20 text-sage' : 'bg-cream text-muted'}`}>
+                          {s.activo ? 'Activo' : 'Inactivo'}
+                        </span>
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button
+                            onClick={() => handleToggleServicio(s.id, s.activo)}
+                            className="p-1.5 rounded-lg hover:bg-cream text-muted"
+                            title={s.activo ? 'Desactivar' : 'Activar'}
+                          >
+                            {s.activo ? <Eye size={15} /> : <EyeOff size={15} />}
+                          </button>
+                          <button
+                            onClick={() => { setEditingServicioId(s.id); setEditServicioForm({ label: s.label, icono: s.icono }) }}
+                            className="p-1.5 rounded-lg hover:bg-cream text-muted"
+                          >
+                            <Edit size={15} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteServicio(s.id)}
+                            className="p-1.5 rounded-lg hover:bg-danger/10 text-danger"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {activeTab === 'Guías' && (
         <div>
