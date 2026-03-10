@@ -23,16 +23,26 @@ const serviciosIncluidosRoutes = require('./routes/serviciosIncluidos.routes')
 const app = express()
 
 // Configuración de CORS
+const allowedOrigins = [
+  process.env.ADMIN_URL,
+  process.env.PROVEEDOR_URL,
+  process.env.WEB_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'http://localhost:5176'
+].filter(Boolean)
+
+// Agregar variante www para WEB_URL (ej: https://vivesilver.com -> https://www.vivesilver.com)
+if (process.env.WEB_URL) {
+  const url = new URL(process.env.WEB_URL)
+  if (!url.hostname.startsWith('www.')) {
+    allowedOrigins.push(`${url.protocol}//www.${url.hostname}`)
+  }
+}
+
 const corsOptions = {
-  origin: [
-    process.env.ADMIN_URL,
-    process.env.PROVEEDOR_URL,
-    process.env.WEB_URL,
-    'http://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5175',
-    'http://localhost:5176'
-  ],
+  origin: allowedOrigins,
   credentials: true
 }
 
